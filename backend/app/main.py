@@ -7,6 +7,8 @@ from app.core.config import settings
 from app.core.logger import logger
 from app.database.session import engine
 
+from app.api.auth import router as auth_router
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -42,3 +44,5 @@ async def health():
     return {
         "status": "healthy"
     }
+
+app.include_router(auth_router)
