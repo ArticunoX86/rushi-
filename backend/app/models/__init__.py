@@ -1,3 +1,8 @@
 from app.models.user import User
+from app.models.property import Property
 
-__all__ = ["User"]
+
+__all__ = [
+    "User",
+    "Property",
+]

@@ -8,6 +8,7 @@ from app.core.logger import logger
 from app.database.session import engine
 
 from app.api.auth import router as auth_router
+from app.api.properties import router as property_router
 
 
 @asynccontextmanager
@@ -15,11 +16,18 @@ async def lifespan(app: FastAPI):
     try:
         with engine.connect() as connection:
             connection.execute(text("SELECT 1"))
+
         logger.info("✅ Database connected successfully.")
+
     except Exception as e:
-        logger.error(f"❌ Database connection failed: {e}")
+
+        logger.error(
+            f"❌ Database connection failed: {e}"
+        )
+
 
     yield
+
 
 
 app = FastAPI(
@@ -30,8 +38,10 @@ app = FastAPI(
 )
 
 
+
 @app.get("/")
 async def root():
+
     return {
         "status": "running",
         "application": settings.APP_NAME,
@@ -39,10 +49,20 @@ async def root():
     }
 
 
+
 @app.get("/health")
 async def health():
+
     return {
         "status": "healthy"
     }
 
+
+
+# ==================================================
+# API ROUTERS
+# ==================================================
+
 app.include_router(auth_router)
+
+app.include_router(property_router)
