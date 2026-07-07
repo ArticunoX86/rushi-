@@ -10,6 +10,8 @@ from app.database.session import engine
 from app.api.auth import router as auth_router
 from app.api.properties import router as property_router
 
+from app.api.leads import router as lead_router
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -66,3 +68,5 @@ async def health():
 app.include_router(auth_router)
 
 app.include_router(property_router)
+
+app.include_router(lead_router)

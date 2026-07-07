@@ -1,8 +1,9 @@
 from app.models.user import User
 from app.models.property import Property
-
+from app.models.lead import Lead
 
 __all__ = [
     "User",
     "Property",
+    "Lead",
 ]
