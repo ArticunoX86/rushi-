@@ -1,3 +1,4 @@
+import uuid
 from decimal import Decimal
 from datetime import datetime
 
@@ -43,7 +44,7 @@ class Lead(Base, TimestampMixin):
     )
 
 
-    last_name: Mapped[str] = mapped_column(
+    last_name: Mapped[str | None] = mapped_column(
         String(100),
         nullable=True,
     )
@@ -69,31 +70,37 @@ class Lead(Base, TimestampMixin):
     preferred_city: Mapped[str | None] = mapped_column(
         String(100),
         index=True,
+        nullable=True,
     )
 
 
     preferred_locality: Mapped[str | None] = mapped_column(
         String(150),
+        nullable=True,
     )
 
 
     budget_min: Mapped[Decimal | None] = mapped_column(
-        Numeric(12,2),
+        Numeric(12, 2),
+        nullable=True,
     )
 
 
     budget_max: Mapped[Decimal | None] = mapped_column(
-        Numeric(12,2),
+        Numeric(12, 2),
+        nullable=True,
     )
 
 
     bedrooms: Mapped[int | None] = mapped_column(
         Integer,
+        nullable=True,
     )
 
 
     property_type: Mapped[PropertyType | None] = mapped_column(
         Enum(PropertyType),
+        nullable=True,
     )
 
 
@@ -134,16 +141,19 @@ class Lead(Base, TimestampMixin):
 
     last_call_time: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True),
+        nullable=True,
     )
 
 
     next_followup_time: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True),
+        nullable=True,
     )
 
 
     conversation_summary: Mapped[str | None] = mapped_column(
         Text,
+        nullable=True,
     )
 
 
@@ -151,15 +161,27 @@ class Lead(Base, TimestampMixin):
     # Assignment
     # ==================================================
 
-    assigned_to: Mapped[UUID | None] = mapped_column(
+    assigned_to: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("users.id"),
+        nullable=True,
     )
 
 
     assigned_user = relationship(
         "User",
         backref="leads",
+    )
+
+
+    # ==================================================
+    # AI Call Relationship
+    # ==================================================
+
+    calls = relationship(
+        "Call",
+        back_populates="lead",
+        cascade="all, delete-orphan",
     )
 
 

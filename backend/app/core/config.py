@@ -31,9 +31,9 @@ class Settings(BaseSettings):
     DATABASE_URL: str
 
     # ==========================================================
-    # OpenAI
+    # Gemini
     # ==========================================================
-    OPENAI_API_KEY: str = ""
+    GEMINI_API_KEY: str = ""
 
     # ==========================================================
     # Deepgram
@@ -78,7 +78,7 @@ class Settings(BaseSettings):
     # ==========================================================
     # AI Configuration
     # ==========================================================
-    AI_MODEL: str = "gpt-5.5"
+    AI_MODEL: str = "gemini-2.0-flash"
     AI_TEMPERATURE: float = 0.4
     AI_MAX_TOKENS: int = 1000
 

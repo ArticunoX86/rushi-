@@ -1,4 +1,5 @@
 from enum import Enum
+import enum
 
 
 class UserRole(str, Enum):
@@ -51,3 +52,46 @@ class LeadSource(str, Enum):
     MANUAL = "MANUAL"
     CSV_IMPORT = "CSV_IMPORT"
     API = "API"
+
+
+
+class CallStatus(str, enum.Enum):
+    SCHEDULED = "scheduled"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    FAILED = "failed"
+    MISSED = "missed"
+
+
+class CallDirection(str, enum.Enum):
+    INBOUND = "inbound"
+    OUTBOUND = "outbound"
+
+
+class CallOutcome(str, enum.Enum):
+    INTERESTED = "interested"
+    NOT_INTERESTED = "not_interested"
+    CALLBACK_REQUESTED = "callback_requested"
+    NO_RESPONSE = "no_response"
+    CONVERTED = "converted"
+
+class MessageSender(str, enum.Enum):
+
+    AI = "ai"
+
+    CUSTOMER = "customer"
+
+
+class MessageIntent(str, enum.Enum):
+
+    GREETING = "greeting"
+
+    PROPERTY_REQUIREMENT = "property_requirement"
+
+    QUESTION = "question"
+
+    CALLBACK_REQUEST = "callback_request"
+
+    NOT_INTERESTED = "not_interested"
+
+    UNKNOWN = "unknown"
