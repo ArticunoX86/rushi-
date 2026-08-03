@@ -61,6 +61,7 @@ class CallStatus(str, enum.Enum):
     COMPLETED = "completed"
     FAILED = "failed"
     MISSED = "missed"
+    REJECTED = "rejected"
 
 
 class CallDirection(str, enum.Enum):
@@ -95,3 +96,9 @@ class MessageIntent(str, enum.Enum):
     NOT_INTERESTED = "not_interested"
 
     UNKNOWN = "unknown"
+
+
+class DeviceStatus(str, Enum):
+    ONLINE = "ONLINE"
+    OFFLINE = "OFFLINE"
+    BUSY = "BUSY"

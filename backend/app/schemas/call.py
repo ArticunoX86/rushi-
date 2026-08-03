@@ -21,14 +21,13 @@ class CallBase(BaseModel):
     direction: CallDirection = CallDirection.OUTBOUND
 
 
-
 # =====================================
 # CREATE CALL
 # =====================================
 
 class CallCreate(CallBase):
-    pass
 
+    pass
 
 
 # =====================================
@@ -50,7 +49,6 @@ class CallUpdate(BaseModel):
     summary: str | None = None
 
     outcome: CallOutcome | None = None
-
 
 
 # =====================================
@@ -78,8 +76,19 @@ class CallResponse(CallBase):
     outcome: CallOutcome | None
 
     created_at: datetime
+
     updated_at: datetime | None
 
 
     class Config:
+
         from_attributes = True
+
+
+# =====================================
+# START AI CALL REQUEST
+# =====================================
+
+class StartCallRequest(BaseModel):
+
+    lead_id: uuid.UUID

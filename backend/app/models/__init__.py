@@ -8,6 +8,10 @@ from app.models.call import Call
 
 from app.models.conversation import Conversation
 
+from app.models.device import Device
+
+from app.models.app_log import AppLog
+
 
 
 __all__ = [
@@ -21,5 +25,9 @@ __all__ = [
     "Call",
 
     "Conversation",
+
+    "Device",
+
+    "AppLog",
 
 ]

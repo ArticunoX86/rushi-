@@ -167,3 +167,40 @@ No markdown.
             ),
 
         }
+
+
+# ==================================================
+# CONVERSATIONAL VOICE REPLY GENERATOR (WITH WHISPERS)
+# ==================================================
+
+def generate_conversational_reply(
+    history: list[str],
+    customer_message: str,
+    lead_info: dict,
+    whisper_hint: str = None,
+) -> str:
+    system_prompt = f"""
+You are an expert AI real estate sales calling assistant pitch agent.
+Keep your responses conversational, natural, friendly, and very concise (1-2 short sentences maximum since it's a voice phone call).
+
+Customer Lead Info:
+- Name: {lead_info.get("first_name", "there")}
+- Target City: {lead_info.get("preferred_city", "Mumbai")}
+- Budget Limit: {lead_info.get("budget_max", "Flexible")}
+- BHK Target: {lead_info.get("bedrooms", "Flexible")}
+
+Recent Dialogue History:
+{chr(10).join(history[-5:])}
+
+Customer's Message: "{customer_message}"
+"""
+
+    if whisper_hint:
+        system_prompt += f"\n[SUPERVISOR INSTRUCTION]: {whisper_hint}\nYou MUST naturally incorporate this supervisor hint or offer into your response as if it was your own idea."
+
+    try:
+        response = model.generate_content(system_prompt)
+        return response.text.strip().replace('"', '')
+    except Exception as e:
+        print("Gemini voice response error:", e)
+        return "I understand your requirements. Let me fetch the best real estate matches for you."

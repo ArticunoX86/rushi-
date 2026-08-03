@@ -23,6 +23,15 @@ from app.api.speech import router as speech_router
 from app.api.voice import router as voice_router
 from app.api.voice_agent import router as voice_agent_router
 from app.api.realtime_call import router as realtime_router
+from app.api.devices import router as device_router
+from app.api.device_socket import router as device_socket_router
+from app.api.call_dispatch import router as call_dispatch_router
+from app.api.logs import router as logs_router
+from app.api.webrtc import router as webrtc_router
+from app.api.dashboard import router as dashboard_router
+from app.api.airtel_sip import router as airtel_sip_router
+from app.api.analytics import router as analytics_router
+from app.api.salesforce import router as salesforce_router
 
 
 
@@ -144,4 +153,40 @@ app.include_router(
 
 app.include_router(
     realtime_router
+)
+
+app.include_router(
+    device_router
+)
+
+app.include_router(
+    device_socket_router
+)
+
+app.include_router(
+    call_dispatch_router
+)
+
+app.include_router(
+    logs_router
+)
+
+app.include_router(
+    webrtc_router
+)
+
+app.include_router(
+    dashboard_router
+)
+
+app.include_router(
+    airtel_sip_router
+)
+
+app.include_router(
+    analytics_router
+)
+
+app.include_router(
+    salesforce_router
 )

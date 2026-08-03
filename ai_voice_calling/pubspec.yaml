@@ -1,0 +1,82 @@
+name: ai_voice_calling
+description: "AI Voice Calling Platform"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # ==========================================
+  # STATE MANAGEMENT
+  # ==========================================
+
+  flutter_riverpod: ^2.6.1
+
+  # ==========================================
+  # ROUTING
+  # ==========================================
+
+  go_router: ^16.1.0
+
+  # ==========================================
+  # HTTP CLIENT
+  # ==========================================
+
+  dio: ^5.9.0
+
+  # ==========================================
+  # WEBRTC REAL-TIME AUDIO
+  # ==========================================
+
+  livekit_client: ^2.2.0
+
+  # ==========================================
+  # WEBSOCKET
+  # ==========================================
+
+  web_socket_channel: ^3.0.3
+
+  # ==========================================
+  # LOCAL STORAGE
+  # ==========================================
+
+  shared_preferences: ^2.5.3
+
+  # ==========================================
+  # LOGGING
+  # ==========================================
+
+  logger: ^2.6.1
+
+  # ==========================================
+  # UUID
+  # ==========================================
+
+  uuid: ^4.5.1
+
+    # ==========================================
+  # DEVICE INFORMATION
+  # ==========================================
+
+  device_info_plus: ^11.5.0
+  permission_handler: ^12.0.3
+  http: ^1.6.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/nexavoice_logo.png

@@ -81,6 +81,7 @@ def get_all_calls(
 
     return (
         db.query(Call)
+        .order_by(Call.created_at.desc())
         .offset(skip)
         .limit(limit)
         .all()
