@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 import '../providers/calls_provider.dart';
 import 'widgets/call_job_card.dart';
@@ -13,17 +14,17 @@ class CallsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final calls = ref.watch(callsProvider);
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: const Text("Calls", style: TextStyle(color: Color(0xFF0F172A), fontWeight: FontWeight.bold)),
-        centerTitle: true,
-      ),
-
-      body: SafeArea(
-        child: Column(
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF8FAFC),
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: const Text("Calls", style: TextStyle(color: Color(0xFF0F172A), fontWeight: FontWeight.bold)),
+          centerTitle: true,
+        ),
+  
+        body: Column(
           children: [
             const SizedBox(height: 20),
 
@@ -33,7 +34,7 @@ class CallsScreen extends ConsumerWidget {
               ),
               child: WaitingForJobsWidget(
                 totalJobs: calls.totalJobs,
-              ),
+              ).animate().fade().slideY(begin: -0.2, end: 0, curve: Curves.easeOutCubic),
             ),
 
             const SizedBox(height: 20),
@@ -50,7 +51,7 @@ class CallsScreen extends ConsumerWidget {
                       itemBuilder: (context, index) {
                         return CallJobCard(
                           job: calls.jobs[index],
-                        );
+                        ).animate(delay: (index * 100).ms).fade(duration: 500.ms).slideX(begin: 0.1, end: 0, curve: Curves.easeOutCubic);
                       },
                     )
                   : const EmptyCallsWidget(),

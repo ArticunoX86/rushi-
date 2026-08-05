@@ -7,11 +7,25 @@ class DioClient {
   DioClient._() {
     dio.interceptors.add(
       InterceptorsWrapper(
-        onError: (DioException e, handler) {
-          if (e.type == DioExceptionType.connectionTimeout ||
-              e.type == DioExceptionType.connectionError ||
-              e.type == DioExceptionType.receiveTimeout) {
+        onError: (DioException e, handler) async {
+          if (_isTransientError(e)) {
             _networkStatusController.add(true); // emit offline
+            
+            // Implement Exponential Backoff Retry (Max 3 retries)
+            final extra = e.requestOptions.extra;
+            final int retries = (extra['retries'] as int?) ?? 0;
+            if (retries < 3) {
+              extra['retries'] = retries + 1;
+              await Future.delayed(Duration(milliseconds: 1000 * (retries + 1)));
+              try {
+                final response = await dio.fetch(e.requestOptions);
+                return handler.resolve(response);
+              } catch (retryError) {
+                if (retryError is DioException) {
+                  return handler.next(retryError);
+                }
+              }
+            }
           }
           return handler.next(e);
         },
@@ -21,6 +35,13 @@ class DioClient {
         },
       ),
     );
+  }
+
+  bool _isTransientError(DioException e) {
+    return e.type == DioExceptionType.connectionTimeout ||
+           e.type == DioExceptionType.connectionError ||
+           e.type == DioExceptionType.receiveTimeout ||
+           (e.response != null && e.response!.statusCode! >= 500);
   }
 
   static final DioClient instance = DioClient._();

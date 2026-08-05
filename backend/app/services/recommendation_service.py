@@ -46,9 +46,7 @@ def get_property_recommendations(
 
 
     # City Matching
-
-    if lead.preferred_city:
-
+    if lead.preferred_city and lead.preferred_city.lower() != "string":
         query = query.filter(
             Property.city.ilike(
                 f"%{lead.preferred_city}%"
@@ -58,9 +56,7 @@ def get_property_recommendations(
 
 
     # Locality Matching
-
-    if lead.preferred_locality:
-
+    if lead.preferred_locality and lead.preferred_locality.lower() != "string":
         query = query.filter(
             Property.locality.ilike(
                 f"%{lead.preferred_locality}%"
@@ -94,13 +90,9 @@ def get_property_recommendations(
 
 
     # Budget Matching
-
-    if lead.budget_max:
-
+    if lead.budget_max and lead.budget_max > 0:
         query = query.filter(
-            Property.price
-            <=
-            lead.budget_max
+            Property.price <= lead.budget_max
         )
 
 

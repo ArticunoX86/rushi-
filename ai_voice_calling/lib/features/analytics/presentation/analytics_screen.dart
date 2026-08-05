@@ -1,6 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/network/dio_client.dart';
+import '../../transcripts/presentation/call_details_screen.dart';
 
 class AnalyticsScreen extends StatefulWidget {
   const AnalyticsScreen({super.key});
@@ -33,17 +37,37 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   Future<void> _fetchAnalytics({bool showLoading = false}) async {
     if (showLoading) {
       setState(() => _isLoading = true);
+      
+      // Load cached data first for instant UI response (Offline Caching)
+      final prefs = await SharedPreferences.getInstance();
+      final cached = prefs.getString('analytics_cache');
+      if (cached != null) {
+        if (mounted) {
+          setState(() {
+            _data = jsonDecode(cached);
+            _isLoading = false;
+          });
+        }
+      }
     }
+    
     try {
       final res = await DioClient.instance.dio.get('/analytics/overview');
-      if (res.statusCode == 200 && res.data != null && mounted) {
-        setState(() {
-          _data = res.data['data'];
-          _isLoading = false;
-        });
+      if (res.statusCode == 200 && res.data != null) {
+        
+        // Save to cache
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('analytics_cache', jsonEncode(res.data['data']));
+
+        if (mounted) {
+          setState(() {
+            _data = res.data['data'];
+            _isLoading = false;
+          });
+        }
       }
     } catch (e) {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted && _data == null) setState(() => _isLoading = false);
     }
   }
 
@@ -102,8 +126,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           ),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: Colors.blueAccent))
+      body: _isLoading && _data == null
+          ? const _AnalyticsSkeletonLoader()
           : SafeArea(
               child: ListView(
                 padding: const EdgeInsets.all(20),
@@ -167,6 +191,15 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   const SizedBox(height: 24),
 
                   // ==========================================
+                  // AVERAGE LEAD SCORE GAUGE
+                  // ==========================================
+                  _buildSectionTitle("AI Lead Quality Score", Icons.star_border_purple500),
+                  const SizedBox(height: 10),
+                  _buildLeadScoreGauge(kpis),
+
+                  const SizedBox(height: 24),
+
+                  // ==========================================
                   // CALL OUTCOME BREAKDOWN
                   // ==========================================
                   _buildSectionTitle("Call Outcome Distribution", Icons.pie_chart),
@@ -191,6 +224,15 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   const SizedBox(height: 10),
                   _buildSentimentMeter(sentiment),
 
+                  const SizedBox(height: 24),
+
+                  // ==========================================
+                  // RECENT CALL INSIGHTS (TRANSCRIPTS)
+                  // ==========================================
+                  _buildSectionTitle("Recent Call Insights", Icons.record_voice_over),
+                  const SizedBox(height: 10),
+                  _buildRecentCallsInsights(),
+
                   const SizedBox(height: 40),
                 ],
               ),
@@ -205,7 +247,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         const SizedBox(width: 8),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             color: Color(0xFF0F172A),
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -233,7 +275,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           const SizedBox(height: 12),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               color: Color(0xFF0F172A),
               fontSize: 22,
               fontWeight: FontWeight.bold,
@@ -316,7 +358,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(title, style: const TextStyle(color: Color(0xFF0F172A), fontSize: 13, fontWeight: FontWeight.w500)),
+            Text(title, style: TextStyle(color: Color(0xFF0F172A), fontSize: 13, fontWeight: FontWeight.w500)),
             Text("$count calls", style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12)),
           ],
         ),
@@ -364,7 +406,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           children: [
             CircleAvatar(radius: 4, backgroundColor: color),
             const SizedBox(width: 8),
-            Text(name, style: const TextStyle(color: Color(0xFF0F172A), fontSize: 13, fontWeight: FontWeight.w500)),
+            Text(name, style: TextStyle(color: Color(0xFF0F172A), fontSize: 13, fontWeight: FontWeight.w500)),
           ],
         ),
         Text(value, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12)),
@@ -402,6 +444,257 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         const SizedBox(height: 2),
         Text(label, style: TextStyle(color: Colors.grey.shade600, fontSize: 11)),
       ],
+    );
+  }
+
+  // ===============================================
+  // NEW LEAD SCORE GAUGE
+  // ===============================================
+  Widget _buildLeadScoreGauge(Map<String, dynamic> kpis) {
+    final double score = (kpis['avg_lead_score'] as num?)?.toDouble() ?? 78.5;
+    
+    Color scoreColor;
+    if (score >= 80) {
+      scoreColor = Colors.greenAccent.shade700;
+    } else if (score >= 50) {
+      scoreColor = Colors.orangeAccent;
+    } else {
+      scoreColor = Colors.redAccent;
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 3)),
+        ],
+        border: Border.all(color: scoreColor.withOpacity(0.3), width: 1),
+      ),
+      child: Column(
+        children: [
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              SizedBox(
+                height: 100,
+                width: 100,
+                child: CircularProgressIndicator(
+                  value: score / 100,
+                  strokeWidth: 10,
+                  backgroundColor: const Color(0xFFE2E8F0),
+                  color: scoreColor,
+                  strokeCap: StrokeCap.round,
+                ),
+              ),
+              Column(
+                children: [
+                  Text(
+                    score.toStringAsFixed(1),
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: scoreColor,
+                    ),
+                  ),
+                  const Text(
+                    "/ 100",
+                    style: TextStyle(fontSize: 10, color: Colors.grey),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            "Overall AI Conversion Potential",
+            style: TextStyle(
+              color: Color(0xFF0F172A),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ===============================================
+  // NEW RECENT CALL INSIGHTS (TRANSCRIPTS)
+  // ===============================================
+  Widget _buildRecentCallsInsights() {
+    // Mocking recent calls that have a transcript summary and a lead score
+    final recentCalls = [
+      {"name": "John Doe", "score": 92.0, "summary": "Highly interested in 3 BHK. Requested callback tomorrow.", "sentiment": "Positive"},
+      {"name": "Sarah Smith", "score": 45.0, "summary": "Not looking to buy currently. Found the pricing too high.", "sentiment": "Negative"},
+      {"name": "Michael Lee", "score": 75.0, "summary": "Asked for a brochure for the commercial plots. Warm lead.", "sentiment": "Neutral"},
+    ];
+
+    return SizedBox(
+      height: 180,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: recentCalls.length,
+        itemBuilder: (context, index) {
+          final call = recentCalls[index];
+          final score = call['score'] as double;
+          
+          Color scoreColor = score >= 80 ? Colors.green : (score >= 50 ? Colors.orange : Colors.red);
+          
+          return Hero(
+            tag: 'recent_call_${call['name']}',
+            child: Material(
+              color: Colors.transparent,
+              child: Container(
+            width: 280,
+            margin: const EdgeInsets.only(right: 16, bottom: 8, top: 4),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: const [
+                BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      call['name'] as String,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: scoreColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        "Score: ${score.toInt()}",
+                        style: TextStyle(color: scoreColor, fontWeight: FontWeight.bold, fontSize: 12),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Expanded(
+                  child: Text(
+                    call['summary'] as String,
+                    style: TextStyle(color: Colors.grey.shade600, fontSize: 13, height: 1.4),
+                    overflow: TextOverflow.fade,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          transitionDuration: const Duration(milliseconds: 600),
+                          reverseTransitionDuration: const Duration(milliseconds: 400),
+                          pageBuilder: (context, animation, secondaryAnimation) => FadeTransition(
+                            opacity: animation,
+                            child: CallDetailsScreen(
+                              leadName: call['name'] as String,
+                              score: score,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.receipt_long, size: 16),
+                    label: const Text("View Transcript", style: TextStyle(fontSize: 12)),
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      minimumSize: const Size(0, 0),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _AnalyticsSkeletonLoader extends StatefulWidget {
+  const _AnalyticsSkeletonLoader({Key? key}) : super(key: key);
+
+  @override
+  State<_AnalyticsSkeletonLoader> createState() => _AnalyticsSkeletonLoaderState();
+}
+
+class _AnalyticsSkeletonLoaderState extends State<_AnalyticsSkeletonLoader>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: Tween<double>(begin: 0.4, end: 1.0).animate(_controller),
+      child: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
+            Row(
+              children: [
+                Expanded(child: _buildSkeletonBox(100)),
+                const SizedBox(width: 14),
+                Expanded(child: _buildSkeletonBox(100)),
+              ],
+            ),
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                Expanded(child: _buildSkeletonBox(100)),
+                const SizedBox(width: 14),
+                Expanded(child: _buildSkeletonBox(100)),
+              ],
+            ),
+            const SizedBox(height: 24),
+            _buildSkeletonBox(140),
+            const SizedBox(height: 24),
+            _buildSkeletonBox(160),
+            const SizedBox(height: 24),
+            _buildSkeletonBox(200),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSkeletonBox(double height) {
+    return Container(
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(18),
+      ),
     );
   }
 }

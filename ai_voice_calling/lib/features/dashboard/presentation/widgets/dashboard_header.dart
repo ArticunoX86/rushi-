@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class DashboardHeader extends StatelessWidget {
   final bool online;
@@ -11,22 +12,22 @@ class DashboardHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
-            Color(0xFF1B8B4B),
-            Color(0xFF26A35A),
+            Color(0xFF7C3AED),
+            Color(0xFF5B21B6), // Deeper violet for richer contrast
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: Colors.blue.withAlpha(60),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: const Color(0xFF7C3AED).withOpacity(0.3),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
@@ -36,21 +37,22 @@ class DashboardHeader extends StatelessWidget {
           const Icon(
             Icons.support_agent_rounded,
             color: Colors.white,
-            size: 50,
-          ),
+            size: 56,
+          ).animate(onPlay: (controller) => controller.repeat()).shimmer(duration: 2000.ms, color: Colors.white.withOpacity(0.4)),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
 
           const Text(
             "AI Voice Calling",
             style: TextStyle(
               color: Colors.white,
-              fontSize: 30,
+              fontSize: 32,
               fontWeight: FontWeight.bold,
+              letterSpacing: -0.5,
             ),
-          ),
+          ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.2, end: 0, curve: Curves.easeOutQuad),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
 
           const Text(
             "Commercial AI Calling Platform",
@@ -58,9 +60,9 @@ class DashboardHeader extends StatelessWidget {
               color: Colors.white70,
               fontSize: 16,
             ),
-          ),
+          ).animate().fadeIn(delay: 200.ms, duration: 600.ms).slideY(begin: 0.2, end: 0, curve: Curves.easeOutQuad),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 28),
 
           Container(
             padding: const EdgeInsets.symmetric(
@@ -70,6 +72,7 @@ class DashboardHeader extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white.withAlpha(35),
               borderRadius: BorderRadius.circular(30),
+              border: Border.all(color: Colors.white.withAlpha(50)),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -78,7 +81,7 @@ class DashboardHeader extends StatelessWidget {
                   Icons.circle,
                   color: online ? Colors.greenAccent : Colors.redAccent,
                   size: 12,
-                ),
+                ).animate(onPlay: (controller) => controller.repeat()).shimmer(duration: 1500.ms, delay: 500.ms),
 
                 const SizedBox(width: 10),
 
@@ -86,12 +89,12 @@ class DashboardHeader extends StatelessWidget {
                   online ? "Device Online" : "Offline",
                   style: const TextStyle(
                     color: Colors.white,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
             ),
-          ),
+          ).animate().fadeIn(delay: 400.ms, duration: 600.ms),
         ],
       ),
     );

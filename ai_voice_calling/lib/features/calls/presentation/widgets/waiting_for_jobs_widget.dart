@@ -20,7 +20,7 @@ class WaitingForJobsWidget extends StatelessWidget {
               backgroundColor: Color(0xFFE8F0FE),
               child: Icon(
                 Icons.wifi,
-                color: Color(0xFF1B8B4B),
+                color: Color(0xFF7C3AED),
                 size: 30,
               ),
             ),
@@ -54,7 +54,7 @@ class WaitingForJobsWidget extends StatelessWidget {
 
             CircleAvatar(
               backgroundColor:
-                  const Color(0xFF1B8B4B),
+                  const Color(0xFF7C3AED),
               child: Text(
                 totalJobs.toString(),
                 style: const TextStyle(

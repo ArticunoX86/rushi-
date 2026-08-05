@@ -28,179 +28,69 @@ model = genai.GenerativeModel(
 # CUSTOMER MESSAGE ANALYZER
 # ==================================================
 
-def analyze_customer_message(
-    message: str,
-):
-
-    prompt = f"""
-You are an AI real estate calling assistant.
-
-Your job is to understand customer property requirements
-from a phone conversation.
-
-
-Customer Message:
-
-"{message}"
-
-
-Extract information and return ONLY valid JSON.
-
-
-Required JSON format:
-
-
-{{
-    "city": null,
-    "locality": null,
-    "budget": null,
-    "bedrooms": null,
-    "property_type": null,
-    "intent": null,
-    "sentiment": null,
-    "summary": null
-}}
-
-
-Extraction Rules:
-
-1. Convert budget into INR integer.
-
-Examples:
-
-"1.5 crore"
-=
-15000000
-
-
-"80 lakh"
-=
-8000000
-
-
-
-2. Extract bedrooms:
-
-"3BHK"
-=
-3
-
-
-
-3. Understand:
-
-- English
-- Hindi
-- Hinglish
-
-
-
-Intent options:
-
-BUY_PROPERTY
-RENT_PROPERTY
-CALLBACK
-NOT_INTERESTED
-UNKNOWN
-
-
-
-Sentiment options:
-
-HOT
-WARM
-COLD
-
-
-
-Return only JSON.
-No explanation.
-No markdown.
-
-"""
-
-
-    # ==================================================
-    # GEMINI API CALL
-    # ==================================================
-
-    try:
-
-        response = model.generate_content(prompt)
-
-        cleaned_response = (
-            response.text
-            .replace("```json", "")
-            .replace("```", "")
-            .strip()
-        )
-
-        return json.loads(cleaned_response)
-
-
-    # ==================================================
-    # FALLBACK IF GEMINI FAILS
-    # ==================================================
-
-    except Exception as e:
-
-        print("Gemini Error:", e)
-
-        return {
-
-            "city": None,
-
-            "locality": None,
-
-            "budget": None,
-
-            "bedrooms": None,
-
-            "property_type": None,
-
-            "intent": "UNKNOWN",
-
-            "sentiment": "COLD",
-
-            "summary": (
-                "AI analysis unavailable"
-            ),
-
-        }
-
-
 # ==================================================
-# CONVERSATIONAL VOICE REPLY GENERATOR (WITH WHISPERS)
+# SINGLE-TURN UNIFIED ENGINE
 # ==================================================
-
-def generate_conversational_reply(
+def process_conversation_turn(
     history: list[str],
     customer_message: str,
     lead_info: dict,
     whisper_hint: str = None,
-) -> str:
-    system_prompt = f"""
-You are an expert AI real estate sales calling assistant pitch agent.
-Keep your responses conversational, natural, friendly, and very concise (1-2 short sentences maximum since it's a voice phone call).
+) -> dict:
+    prompt = f"""
+You are a highly persuasive and friendly human sales representative for a real estate agency.
+Your task is to analyze the customer's message to extract their CRM requirements AND generate your conversational reply.
+
+### Sales Playbook & Objection Handling:
+1. **Be Persuasive but Natural:** Act like a friendly human, not a pushy robot. Never use words like "leads", "CRM", or "AI".
+2. **Handle Objections:** If the customer says "not now" or tries to brush you off, DO NOT immediately give up. Acknowledge their time and offer a low-friction alternative (e.g., "I know you're busy! How about I send a quick WhatsApp with photos for later?").
+3. **Pitching:** Pitch the Available Properties listed below naturally.
+4. **Length:** Keep your conversational reply extremely concise and punchy (1-2 short sentences maximum).
 
 Customer Lead Info:
 - Name: {lead_info.get("first_name", "there")}
-- Target City: {lead_info.get("preferred_city", "Mumbai")}
+- Target City: {lead_info.get("preferred_city", "Flexible")}
 - Budget Limit: {lead_info.get("budget_max", "Flexible")}
 - BHK Target: {lead_info.get("bedrooms", "Flexible")}
+
+Available Properties to Pitch:
+- {", ".join(lead_info.get("recommended_properties", [])) if lead_info.get("recommended_properties") else "No exact matches in system right now."}
 
 Recent Dialogue History:
 {chr(10).join(history[-5:])}
 
 Customer's Message: "{customer_message}"
+
+{chr(10) + f'[SUPERVISOR INSTRUCTION]: {whisper_hint}' + chr(10) + 'You MUST naturally incorporate this supervisor hint into your response.' if whisper_hint else ""}
+
+You must return ONLY a raw JSON object with no markdown formatting.
+{{
+  "crm_update": {{
+    "city": null,
+    "budget": null,
+    "bedrooms": null,
+    "intent": "UNKNOWN",
+    "summary": "Short summary of their needs"
+  }},
+  "conversational_reply": "Your 1-2 sentence response here"
+}}
 """
-
-    if whisper_hint:
-        system_prompt += f"\n[SUPERVISOR INSTRUCTION]: {whisper_hint}\nYou MUST naturally incorporate this supervisor hint or offer into your response as if it was your own idea."
-
     try:
-        response = model.generate_content(system_prompt)
-        return response.text.strip().replace('"', '')
+        response = model.generate_content(prompt)
+        cleaned_response = response.text.replace("```json", "").replace("```", "").strip()
+        return json.loads(cleaned_response)
     except Exception as e:
         print("Gemini voice response error:", e)
-        return "I understand your requirements. Let me fetch the best real estate matches for you."
+        recent_history = " ".join(history).lower() if history else ""
+        if "whatsapp" in recent_history:
+            fallback_reply = "Alright, I'll send those details over shortly. Have a great day!"
+        elif "schedule a visit" in recent_history or "great option" in recent_history:
+            fallback_reply = "No worries at all! I know you're busy. Can I send you some quick details on WhatsApp for later?"
+        else:
+            props = lead_info.get("recommended_properties", [])
+            fallback_reply = f"I actually have a great option right now! {props[0]}. Would you like to schedule a visit?" if props else "I hear you. Give me just a second to pull up some options for you."
+            
+        return {
+            "crm_update": {},
+            "conversational_reply": fallback_reply
+        }

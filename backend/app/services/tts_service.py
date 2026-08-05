@@ -1,4 +1,4 @@
-from app.integrations.elevenlabs.client import (
+from app.integrations.cartesia.client import (
     text_to_speech,
 )
 

@@ -8,7 +8,7 @@ class AppConfig {
   // DEPLOYMENT CONFIGURATION
   // ==========================================
   // Set to TRUE when compiling the APK for production (AWS)
-  static const bool isProduction = false; 
+  static const bool isProduction = true; 
 
   // LOCAL CONFIG (Testing on Wi-Fi)
   static const String _localHost = "192.168.1.9";
@@ -16,7 +16,7 @@ class AppConfig {
 
   // AWS CONFIG (Raw IP since no Domain is used)
   // Replace this with your actual AWS Public IPv4 Address after launching EC2
-  static const String _awsHost = "YOUR.AWS.PUBLIC.IP";
+  static const String _awsHost = "43.205.19.246";
   static const int _awsPort = 8000;
 
   static String get backendHost => isProduction ? _awsHost : _localHost;

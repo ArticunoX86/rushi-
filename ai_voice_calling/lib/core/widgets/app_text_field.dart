@@ -29,7 +29,7 @@ class AppTextField extends StatelessWidget {
 
         filled: true,
 
-        fillColor: Colors.white,
+        fillColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF2A2A3C) : const Color(0xFFF8FAF9),
 
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),

@@ -45,18 +45,18 @@ class _LogsScreenState extends ConsumerState<LogsScreen> {
 
   Color _getLineColor(String line) {
     if (line.contains("❌") || line.contains("ERROR") || line.contains("failed")) {
-      return Colors.redAccent;
+      return Colors.red;
     }
     if (line.contains("⚠️") || line.contains("Warning") || line.contains("warn")) {
-      return Colors.amberAccent;
+      return Colors.orange;
     }
     if (line.contains("📞") || line.contains("CALL") || line.contains("State")) {
-      return Colors.cyanAccent;
+      return Colors.blue;
     }
     if (line.contains("SUCCESS") || line.contains("Connected")) {
-      return Colors.greenAccent;
+      return Colors.green;
     }
-    return Colors.white70;
+    return const Color(0xFF0F172A)70;
   }
 
   @override
@@ -68,13 +68,13 @@ class _LogsScreenState extends ConsumerState<LogsScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A), // Premium dark theme
+      backgroundColor: const Color(0xFFF8FAFC), // Premium dark theme
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: const Color(0xFF0F172A),
         title: const Text(
           "Developer Console Logs",
           style: TextStyle(
-            color: Colors.white,
+            color: const Color(0xFF0F172A),
             fontFamily: 'monospace',
             fontSize: 18,
           ),
@@ -82,7 +82,7 @@ class _LogsScreenState extends ConsumerState<LogsScreen> {
         actions: [
           IconButton(
             tooltip: "Copy all logs",
-            icon: const Icon(Icons.copy, color: Colors.white70),
+            icon: const Icon(Icons.copy, color: Colors.grey.shade700),
             onPressed: () {
               Clipboard.setData(ClipboardData(text: rawLogs.join('\n')));
               ScaffoldMessenger.of(context).showSnackBar(
@@ -92,7 +92,7 @@ class _LogsScreenState extends ConsumerState<LogsScreen> {
           ),
           IconButton(
             tooltip: "Clear Logs",
-            icon: const Icon(Icons.delete_sweep, color: Colors.redAccent),
+            icon: const Icon(Icons.delete_sweep, color: Colors.red),
             onPressed: () {
               ref.read(devLogsProvider.notifier).clearLogs();
             },
@@ -110,11 +110,11 @@ class _LogsScreenState extends ConsumerState<LogsScreen> {
                 Expanded(
                   child: TextField(
                     controller: _searchController,
-                    style: const TextStyle(color: Colors.white, fontFamily: 'monospace'),
+                    style: TextStyle(color: const Color(0xFF0F172A), fontFamily: 'monospace'),
                     decoration: InputDecoration(
                       hintText: "Filter logs...",
-                      hintStyle: const TextStyle(color: Colors.white38),
-                      prefixIcon: const Icon(Icons.search, color: Colors.white54),
+                      hintStyle: const TextStyle(color: const Color(0xFF0F172A)38),
+                      prefixIcon: const Icon(Icons.search, color: const Color(0xFF0F172A)54),
                       fillColor: const Color(0xFF0F172A),
                       filled: true,
                       contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
@@ -130,7 +130,7 @@ class _LogsScreenState extends ConsumerState<LogsScreen> {
                   tooltip: _autoScroll ? "Disable Auto-scroll" : "Enable Auto-scroll",
                   icon: Icon(
                     _autoScroll ? Icons.arrow_downward : Icons.vertical_align_bottom,
-                    color: _autoScroll ? Colors.greenAccent : Colors.white38,
+                    color: _autoScroll ? Colors.green : const Color(0xFF0F172A)38,
                   ),
                   onPressed: () {
                     setState(() {
@@ -155,7 +155,7 @@ class _LogsScreenState extends ConsumerState<LogsScreen> {
                   ? const Center(
                       child: Text(
                         "No logs captured yet.",
-                        style: TextStyle(color: Colors.white38, fontFamily: 'monospace'),
+                        style: TextStyle(color: const Color(0xFF0F172A)38, fontFamily: 'monospace'),
                       ),
                     )
                   : ListView.builder(

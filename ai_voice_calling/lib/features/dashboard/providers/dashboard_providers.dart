@@ -15,6 +15,7 @@ final dashboardProvider = FutureProvider<DashboardInfo>((ref) async {
   String avgDuration = "00:00";
   int totalLeads = 0;
   double conversionRatePct = 0.0;
+  String? activeCallId;
 
   try {
     final response = await DioClient.instance.dio.get('/dashboard/stats');
@@ -26,6 +27,7 @@ final dashboardProvider = FutureProvider<DashboardInfo>((ref) async {
       avgDuration = data['avg_duration'] ?? "00:00";
       totalLeads = data['total_leads'] ?? 0;
       conversionRatePct = (data['conversion_rate_pct'] ?? 0.0).toDouble();
+      activeCallId = data['active_call_id'];
     }
   } catch (e) {
     // Fallback if backend stats fails
@@ -39,6 +41,7 @@ final dashboardProvider = FutureProvider<DashboardInfo>((ref) async {
     backendConnected: websocketState.status == WebSocketStatus.connected,
     websocketConnected: websocketState.status == WebSocketStatus.connected,
     currentCallStatus: activeCalls > 0 ? "Call Active" : "Idle",
+    activeCallId: activeCallId,
     callsToday: callsToday,
     activeCalls: activeCalls,
     completedCalls: completedCalls,

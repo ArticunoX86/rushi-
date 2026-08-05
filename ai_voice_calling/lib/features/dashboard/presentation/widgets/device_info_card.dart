@@ -14,7 +14,7 @@ class DeviceInfoCard extends StatelessWidget {
     required this.phoneNumber,
   });
 
-  Widget buildInfoTile({
+  Widget buildInfoTile(BuildContext context, {
     required IconData icon,
     required String title,
     required String value,
@@ -98,7 +98,7 @@ class DeviceInfoCard extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          buildInfoTile(
+          buildInfoTile(context, 
             icon: Icons.devices,
             title: "Device",
             value: deviceName,
@@ -106,7 +106,7 @@ class DeviceInfoCard extends StatelessWidget {
 
           const Divider(),
 
-          buildInfoTile(
+          buildInfoTile(context, 
             icon: Icons.fingerprint,
             title: "Device ID",
             value: deviceId,
@@ -114,7 +114,7 @@ class DeviceInfoCard extends StatelessWidget {
 
           const Divider(),
 
-          buildInfoTile(
+          buildInfoTile(context, 
             icon: Icons.phone,
             title: "Phone Number",
             value: phoneNumber,

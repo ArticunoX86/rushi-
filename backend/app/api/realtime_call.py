@@ -56,6 +56,7 @@ router = APIRouter(
 async def realtime_call(
     websocket: WebSocket,
     call_id: str,
+    lead_id: str = None,
 ):
     await websocket.accept()
 
@@ -86,7 +87,9 @@ async def realtime_call(
         )
 
         lead = None
-        if db_call and db_call.lead_id:
+        if lead_id:
+            lead = db.query(Lead).filter(Lead.id == lead_id).first()
+        elif db_call and db_call.lead_id:
             lead = db.query(Lead).filter(Lead.id == db_call.lead_id).first()
 
         if not lead:
@@ -243,8 +246,9 @@ async def realtime_call(
         # Wait 1.5 seconds for call line connection to settle, then speak welcome greeting
         await asyncio.sleep(1.5)
         try:
-            greeting_name = lead.first_name if (lead and lead.first_name) else "there"
-            intro_text = f"Hello {greeting_name}! I am your Real Estate AI Assistant. How can I help you find your dream property today?"
+            greeting_name = lead.first_name if (lead and lead.first_name and lead.first_name != "string") else "there"
+            city_name = lead.preferred_city if (lead and lead.preferred_city and lead.preferred_city.lower() != "string") else "the area"
+            intro_text = f"Hi {greeting_name}, how's it going? I'm calling because I saw you looking at some properties recently. Are you still searching for a place in {city_name}?"
             
             save_message(
                 db,

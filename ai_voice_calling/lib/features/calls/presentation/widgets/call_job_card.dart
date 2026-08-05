@@ -7,6 +7,7 @@ import '../../../../services/native_phone_service.dart';
 import '../../providers/calls_provider.dart';
 import '../../../../core/logger/app_logger.dart';
 import '../../../../services/realtime_audio_service.dart';
+import '../screens/active_call_screen.dart';
 
 class CallJobCard extends ConsumerWidget {
   final CallJob job;
@@ -109,10 +110,15 @@ class CallJobCard extends ConsumerWidget {
                         // Remove card from UI
                         ref.read(callsProvider.notifier).removeCallJob(job.id);
 
-                        // Start native phone call
-                        await NativePhoneService.makeCall(
-                          job.phoneNumber,
-                        );
+                        // Navigate to Active Call UI
+                        if (context.mounted) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ActiveCallScreen(job: job),
+                            ),
+                          );
+                        }
                       } catch (e, stackTrace) {
                         AppLogger.logger.e(
                           "Failed to make native call",

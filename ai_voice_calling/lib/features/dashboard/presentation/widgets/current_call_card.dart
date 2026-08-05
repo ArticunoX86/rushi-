@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/widgets/app_card.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../providers/dashboard_providers.dart';
+import '../../../supervisor/services/livekit_listen_service.dart';
 
-class CurrentCallCard extends StatelessWidget {
+class CurrentCallCard extends ConsumerWidget {
   final String status;
+
+  final String? activeCallId;
 
   const CurrentCallCard({
     super.key,
     required this.status,
+    this.activeCallId,
   });
 
   Widget buildInfoRow({
@@ -64,7 +70,9 @@ class CurrentCallCard extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final listenState = ref.watch(livekitListenProvider);
+
     return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,6 +119,49 @@ class CurrentCallCard extends StatelessWidget {
             title: "Duration",
             value: "00:00",
           ),
+
+          if (activeCallId != null) ...[
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: listenState.isListening 
+                      ? Colors.red.shade50 
+                      : Colors.orange.shade50,
+                  foregroundColor: listenState.isListening 
+                      ? Colors.red 
+                      : Colors.orange,
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                onPressed: () {
+                  if (listenState.isListening) {
+                    ref.read(livekitListenProvider.notifier).stopListening();
+                  } else {
+                    ref.read(livekitListenProvider.notifier).startListening(activeCallId!);
+                  }
+                },
+                icon: listenState.isLoading
+                    ? const SizedBox(
+                        width: 20, height: 20, 
+                        child: CircularProgressIndicator(strokeWidth: 2)
+                      )
+                    : Icon(listenState.isListening ? Icons.stop_circle : Icons.headset_mic),
+                label: Text(
+                  listenState.isLoading
+                      ? "Connecting to Room..."
+                      : listenState.isListening
+                          ? "Stop Listening"
+                          : "Listen In to Call",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

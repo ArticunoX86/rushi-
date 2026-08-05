@@ -6,6 +6,7 @@ class DashboardInfo {
   final bool backendConnected;
   final bool websocketConnected;
   final String currentCallStatus;
+  final String? activeCallId;
 
   // Real-time backend stats
   final int callsToday;
@@ -23,6 +24,7 @@ class DashboardInfo {
     required this.backendConnected,
     required this.websocketConnected,
     required this.currentCallStatus,
+    this.activeCallId,
     this.callsToday = 0,
     this.activeCalls = 0,
     this.completedCalls = 0,

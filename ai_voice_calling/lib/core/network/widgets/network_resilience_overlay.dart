@@ -9,8 +9,8 @@ class NetworkResilienceOverlay extends ConsumerWidget {
 
   const NetworkResilienceOverlay({super.key, required this.child});
 
-  static const Color _emerald = Color(0xFF1B8B4B);
-  static const Color _charcoal = Color(0xFF1C1C2E);
+  static const Color _emerald = Color(0xFF7C3AED);
+  static const Color _charcoal = Color(0xFF172554);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

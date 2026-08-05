@@ -32,6 +32,7 @@ from app.api.dashboard import router as dashboard_router
 from app.api.airtel_sip import router as airtel_sip_router
 from app.api.analytics import router as analytics_router
 from app.api.salesforce import router as salesforce_router
+from app.api.endpoints.tata_webhooks import router as tata_webhook_router
 
 
 
@@ -189,4 +190,10 @@ app.include_router(
 
 app.include_router(
     salesforce_router
+)
+
+app.include_router(
+    tata_webhook_router,
+    prefix="/api/tata",
+    tags=["TATA Telephony"]
 )

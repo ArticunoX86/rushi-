@@ -26,3 +26,7 @@ Thumbs.db
 
 # Cache
 .cache/
+# Temp Audio
+*.mp3
+*.wav
+temp/

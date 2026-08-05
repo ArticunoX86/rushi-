@@ -23,8 +23,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   late Animation<Offset> _slideAnim;
 
   // NexaVoice brand colors
-  static const Color _emerald = Color(0xFF1B8B4B);
-  static const Color _emeraldLight = Color(0xFF26A35A);
+  static const Color _emerald = Color(0xFF7C3AED);
+  static const Color _emeraldLight = Color(0xFF8B5CF6);
   static const Color _charcoal = Color(0xFF1C1C2E);
   static const Color _surface = Color(0xFFF4F7F5);
 
@@ -349,7 +349,7 @@ class _NexaTextField extends StatelessWidget {
     this.suffixIcon,
   });
 
-  static const Color _emerald = Color(0xFF1B8B4B);
+  static const Color _emerald = Color(0xFF7C3AED);
   static const Color _charcoal = Color(0xFF1C1C2E);
 
   @override
@@ -396,8 +396,8 @@ class _NexaSignInButton extends StatelessWidget {
     required this.onPressed,
   });
 
-  static const Color _emerald = Color(0xFF1B8B4B);
-  static const Color _emeraldLight = Color(0xFF26A35A);
+  static const Color _emerald = Color(0xFF7C3AED);
+  static const Color _emeraldLight = Color(0xFF8B5CF6);
 
   @override
   Widget build(BuildContext context) {

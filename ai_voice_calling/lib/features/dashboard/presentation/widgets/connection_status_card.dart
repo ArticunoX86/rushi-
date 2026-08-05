@@ -12,7 +12,7 @@ class ConnectionStatusCard extends StatelessWidget {
     required this.websocketConnected,
   });
 
-  Widget buildConnectionTile({
+  Widget buildConnectionTile(BuildContext context, {
     required IconData icon,
     required String title,
     required bool connected,
@@ -108,7 +108,7 @@ class ConnectionStatusCard extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          buildConnectionTile(
+          buildConnectionTile(context, 
             icon: Icons.cloud_done,
             title: "Backend",
             connected: backendConnected,
@@ -116,7 +116,7 @@ class ConnectionStatusCard extends StatelessWidget {
 
           const Divider(),
 
-          buildConnectionTile(
+          buildConnectionTile(context, 
             icon: Icons.wifi,
             title: "WebSocket",
             connected: websocketConnected,

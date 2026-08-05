@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/network/dio_client.dart';
 
@@ -58,7 +59,7 @@ class _SalesforceSyncScreenState extends ConsumerState<SalesforceSyncScreen> {
         
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            backgroundColor: Color(0xFF1B8B4B),
+            backgroundColor: Color(0xFF7C3AED),
             content: Text("Salesforce Sync Completed! Synced: $_syncedCount, Skipped: $_skippedCount"),
           ),
         );
@@ -92,7 +93,7 @@ class _SalesforceSyncScreenState extends ConsumerState<SalesforceSyncScreen> {
         ),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFF1B8B4B)))
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFF7C3AED)))
           : SafeArea(
               child: ListView(
                 padding: const EdgeInsets.all(20),
@@ -129,7 +130,7 @@ class _SalesforceSyncScreenState extends ConsumerState<SalesforceSyncScreen> {
             children: [
               Row(
                 children: const [
-                  Icon(Icons.cloud, color: Color(0xFF1B8B4B), size: 24),
+                  Icon(Icons.cloud, color: Color(0xFF7C3AED), size: 24),
                   SizedBox(width: 8),
                   Text(
                     "CRM Credentials",
@@ -140,13 +141,13 @@ class _SalesforceSyncScreenState extends ConsumerState<SalesforceSyncScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: isConfigured ? Colors.green.withOpacity(0.12) : Color(0xFF1B8B4B).withOpacity(0.12),
+                  color: isConfigured ? Colors.green.withOpacity(0.12) : Color(0xFF7C3AED).withOpacity(0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   isConfigured ? "CONNECTED" : "DEV SANDBOX",
                   style: TextStyle(
-                    color: isConfigured ? Colors.green : Color(0xFF1B8B4B),
+                    color: isConfigured ? Colors.green : Color(0xFF7C3AED),
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
                   ),
@@ -191,7 +192,7 @@ class _SalesforceSyncScreenState extends ConsumerState<SalesforceSyncScreen> {
           ),
           const SizedBox(height: 16),
           if (_isSyncing) ...[
-            const LinearProgressIndicator(color: Color(0xFF1B8B4B), backgroundColor: Color(0xFFF1F5F9)),
+            const LinearProgressIndicator(color: Color(0xFF7C3AED), backgroundColor: Color(0xFFF1F5F9)),
             const SizedBox(height: 12),
           ],
           Row(
@@ -211,7 +212,7 @@ class _SalesforceSyncScreenState extends ConsumerState<SalesforceSyncScreen> {
                   : const Icon(Icons.sync_alt),
               label: Text(_isSyncing ? "Synchronizing..." : "Trigger Salesforce Sync"),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF1B8B4B),
+                backgroundColor: Color(0xFF7C3AED),
                 foregroundColor: Colors.white,
                 minimumSize: const Size.fromHeight(44),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

@@ -23,9 +23,12 @@ def get_dashboard_stats(db: Session = Depends(get_db)):
     calls_today_count = db.query(Call).filter(Call.created_at >= today_start).count()
     
     # Active calls
-    active_calls_count = db.query(Call).filter(
+    active_calls_query = db.query(Call).filter(
         Call.status.in_([CallStatus.SCHEDULED, CallStatus.IN_PROGRESS])
-    ).count()
+    )
+    active_calls_count = active_calls_query.count()
+    active_call = active_calls_query.first()
+    active_call_id = str(active_call.id) if active_call else None
 
     # Completed calls today
     completed_calls_today = db.query(Call).filter(
@@ -54,6 +57,7 @@ def get_dashboard_stats(db: Session = Depends(get_db)):
         "data": {
             "calls_today": calls_today_count,
             "active_calls": active_calls_count,
+            "active_call_id": active_call_id,
             "completed_calls": completed_calls_today,
             "avg_duration": avg_minutes_str,
             "total_duration_seconds": total_seconds,

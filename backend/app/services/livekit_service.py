@@ -2,7 +2,7 @@ import os
 from livekit.api import AccessToken, VideoGrants
 from app.core.config import settings
 
-def generate_room_token(room_name: str, participant_identity: str) -> str:
+def generate_room_token(room_name: str, participant_identity: str, can_publish: bool = True) -> str:
     """
     Generates a secure WebRTC LiveKit JWT access token for a room session.
     """
@@ -17,7 +17,7 @@ def generate_room_token(room_name: str, participant_identity: str) -> str:
             VideoGrants(
                 room_join=True,
                 room=room_name,
-                can_publish=True,
+                can_publish=can_publish,
                 can_subscribe=True,
             )
         )

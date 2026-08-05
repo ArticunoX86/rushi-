@@ -33,8 +33,7 @@ from app.models.enums import (
 
 
 from app.integrations.gemini.client import (
-    analyze_customer_message,
-    generate_conversational_reply,
+    process_conversation_turn,
 )
 from app.crud.conversation import get_conversations_by_call
 
@@ -70,6 +69,24 @@ def process_customer_message(
 
 
     # ==================================================
+    # Ensure Call Exists (for testing scripts that send random call_ids)
+    # ==================================================
+    from app.models.call import Call
+    from app.models.enums import CallDirection, CallStatus
+    
+    db_call = db.query(Call).filter(Call.id == request.call_id).first()
+    if not db_call:
+        db_call = Call(
+            id=request.call_id,
+            lead_id=request.lead_id,
+            direction=CallDirection.OUTBOUND,
+            status=CallStatus.IN_PROGRESS
+        )
+        db.add(db_call)
+        db.commit()
+        db.refresh(db_call)
+
+    # ==================================================
     # Save Customer Message
     # ==================================================
 
@@ -88,69 +105,23 @@ def process_customer_message(
 
 
     # ==================================================
-    # Gemini LLM Understanding
+    # Unified Single-Turn AI Engine
     # ==================================================
+    
+    lead_info = {
+        "first_name": lead.first_name,
+        "preferred_city": lead.preferred_city,
+        "budget_max": lead.budget_max,
+        "bedrooms": lead.bedrooms,
+        "recommended_properties": []
+    }
+    
+    recommendations = get_property_recommendations(db, lead.id)
+    if recommendations and recommendations.get("recommended_properties"):
+        for r in recommendations["recommended_properties"]:
+            lead_info["recommended_properties"].append(f"{r.title} ({r.locality}) for {r.price} INR")
 
-    extracted = analyze_customer_message(
-        request.message
-    )
-
-
-    # ==================================================
-    # Update Lead CRM Automatically
-    # ==================================================
-
-    if extracted.get("city"):
-
-        lead.preferred_city = extracted.get(
-            "city"
-        )
-
-
-    if extracted.get("bedrooms"):
-
-        lead.bedrooms = extracted.get(
-            "bedrooms"
-        )
-
-
-    if extracted.get("budget"):
-
-        lead.budget_max = extracted.get(
-            "budget"
-        )
-
-
-    if extracted.get("summary"):
-
-        lead.conversation_summary = extracted.get(
-            "summary"
-        )
-
-
-    db.commit()
-
-
-    db.refresh(
-        lead
-    )
-
-
-    # ==================================================
-    # Property Recommendation Engine
-    # ==================================================
-
-    recommendations = get_property_recommendations(
-        db,
-        lead.id,
-    )
-
-
-    # ==================================================
-    # Generate Conversational AI Reply with History & Whispers
-    # ==================================================
-
-    # 1. Fetch recent dialog history
+    # Fetch recent dialog history
     history_lines = []
     try:
         db_history = get_conversations_by_call(db, request.call_id)
@@ -160,26 +131,34 @@ def process_customer_message(
     except Exception as e:
         print("Failed to load conversation history:", e)
 
-    # 2. Check and pop supervisor whisper hint
     whisper_hint = active_whispers.pop(str(request.call_id), None)
-    if whisper_hint:
-        print(f"Applied active supervisor whisper: {whisper_hint}")
-
-    # 3. Compile lead profile for prompt context
-    lead_info = {
-        "first_name": lead.first_name,
-        "preferred_city": lead.preferred_city,
-        "budget_max": lead.budget_max,
-        "bedrooms": lead.bedrooms
-    }
-
-    # 4. Generate dynamic response via Gemini client
-    reply = generate_conversational_reply(
+    
+    # SINGLE API CALL: Extracts CRM data AND generates response
+    ai_result = process_conversation_turn(
         history=history_lines,
         customer_message=request.message,
         lead_info=lead_info,
         whisper_hint=whisper_hint
     )
+    
+    extracted = ai_result.get("crm_update", {})
+    reply = ai_result.get("conversational_reply", "I understand. Give me a moment to check.")
+
+    # ==================================================
+    # Update Lead CRM Automatically
+    # ==================================================
+
+    if extracted.get("city"):
+        lead.preferred_city = extracted.get("city")
+    if extracted.get("bedrooms"):
+        lead.bedrooms = extracted.get("bedrooms")
+    if extracted.get("budget"):
+        lead.budget_max = extracted.get("budget")
+    if extracted.get("summary"):
+        lead.conversation_summary = extracted.get("summary")
+
+    db.commit()
+    db.refresh(lead)
 
     # ==================================================
     # Save AI Response

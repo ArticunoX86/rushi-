@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/services.dart';
 import '../../../core/network/dio_client.dart';
 
@@ -104,7 +105,7 @@ class _TranscriptsScreenState extends State<TranscriptsScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh, color: Color(0xFF1B8B4B)),
+            icon: const Icon(Icons.refresh, color: Color(0xFF7C3AED)),
             onPressed: () {
               setState(() => _isLoading = true);
               _fetchCalls();
@@ -131,7 +132,7 @@ class _TranscriptsScreenState extends State<TranscriptsScreen> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.calendar_today, color: Color(0xFF1B8B4B), size: 18),
+                    const Icon(Icons.calendar_today, color: Color(0xFF7C3AED), size: 18),
                     const SizedBox(width: 8),
                     Expanded(
                       child: SingleChildScrollView(
@@ -166,7 +167,7 @@ class _TranscriptsScreenState extends State<TranscriptsScreen> {
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                   decoration: BoxDecoration(
-                                    color: isSel ? Color(0xFF1B8B4B) : Colors.grey.shade100,
+                                    color: isSel ? Color(0xFF7C3AED) : Colors.grey.shade100,
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Text(
@@ -201,7 +202,7 @@ class _TranscriptsScreenState extends State<TranscriptsScreen> {
                 decoration: InputDecoration(
                   hintText: "Search transcripts or keywords...",
                   hintStyle: TextStyle(color: Colors.grey.shade500),
-                  prefixIcon: const Icon(Icons.search, color: Color(0xFF1B8B4B)),
+                  prefixIcon: const Icon(Icons.search, color: Color(0xFF7C3AED)),
                   filled: true,
                   fillColor: Colors.white,
                   border: OutlineInputBorder(
@@ -225,13 +226,14 @@ class _TranscriptsScreenState extends State<TranscriptsScreen> {
                     child: ChoiceChip(
                       label: Text(filter),
                       selected: isSelected,
-                      selectedColor: Color(0xFF1B8B4B),
+                      selectedColor: Color(0xFF7C3AED),
                       backgroundColor: Colors.white,
                       labelStyle: TextStyle(
                         color: isSelected ? Colors.white : Colors.grey.shade700,
                         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                       ),
                       onSelected: (val) {
+                        HapticFeedback.lightImpact();
                         if (val) setState(() => _selectedFilter = filter);
                       },
                     ),
@@ -247,7 +249,23 @@ class _TranscriptsScreenState extends State<TranscriptsScreen> {
             // ==========================================
             Expanded(
               child: _isLoading
-                  ? const Center(child: CircularProgressIndicator(color: Color(0xFF1B8B4B)))
+                                        ? ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          itemCount: 5,
+                          itemBuilder: (context, index) {
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 16),
+                              height: 80,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade200,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ).animate(onPlay: (c) => c.repeat()).shimmer(
+                              duration: 1200.ms,
+                              color: Colors.white.withOpacity(0.6),
+                            );
+                          },
+                        )
                   : _filteredCalls.isEmpty
                       ? _buildEmptyState()
                       : ListView.builder(
@@ -300,7 +318,7 @@ class _TranscriptsScreenState extends State<TranscriptsScreen> {
         ? Colors.green
         : outcome.contains("CALLBACK")
             ? Colors.amber.shade800
-            : Color(0xFF1B8B4B);
+            : Color(0xFF7C3AED);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -319,8 +337,9 @@ class _TranscriptsScreenState extends State<TranscriptsScreen> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           collapsedShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           tilePadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-        iconColor: Color(0xFF1B8B4B),
+        iconColor: Color(0xFF7C3AED),
         collapsedIconColor: Colors.grey.shade600,
+        onExpansionChanged: (expanded) => HapticFeedback.mediumImpact(),
         title: Row(
           children: [
             Container(
@@ -377,16 +396,16 @@ class _TranscriptsScreenState extends State<TranscriptsScreen> {
                   decoration: BoxDecoration(
                     color: const Color(0xFFF8FAFC),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Color(0xFF1B8B4B).withOpacity(0.3)),
+                    border: Border.all(color: Color(0xFF7C3AED).withOpacity(0.3)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: const [
-                          Icon(Icons.auto_awesome, color: Color(0xFF1B8B4B), size: 16),
+                          Icon(Icons.auto_awesome, color: Color(0xFF7C3AED), size: 16),
                           SizedBox(width: 6),
-                          Text("AI Call Summary", style: TextStyle(color: Color(0xFF1B8B4B), fontWeight: FontWeight.bold, fontSize: 12)),
+                          Text("AI Call Summary", style: TextStyle(color: Color(0xFF7C3AED), fontWeight: FontWeight.bold, fontSize: 12)),
                         ],
                       ),
                       const SizedBox(height: 6),
@@ -409,7 +428,7 @@ class _TranscriptsScreenState extends State<TranscriptsScreen> {
                     icon: const Icon(Icons.play_circle_fill, color: Colors.white, size: 18),
                     label: const Text("Copy S3 Audio Recording Link"),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF1B8B4B),
+                      backgroundColor: Color(0xFF7C3AED),
                       foregroundColor: Colors.white,
                       minimumSize: const Size.fromHeight(40),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

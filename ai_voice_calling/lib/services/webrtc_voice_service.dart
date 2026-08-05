@@ -18,8 +18,8 @@ class WebRTCVoiceService {
   /// Requests a WebRTC room token from the backend for the given callId
   Future<Map<String, String>?> _fetchWebRTCToken(String callId) async {
     try {
-      final url = '${AppConfig.apiBaseUrl}/webrtc/token';
-      AppLogger.info('Requesting WebRTC Token: $url for callId: $callId');
+      final url = '${AppConfig.baseUrl}/webrtc/token';
+      AppLogger.logger.i('Requesting WebRTC Token: $url for callId: $callId');
 
       final response = await _dio.post(
         url,
@@ -37,7 +37,7 @@ class WebRTCVoiceService {
         };
       }
     } catch (e) {
-      AppLogger.error('Failed to fetch WebRTC Token', error: e);
+      AppLogger.logger.e('Failed to fetch WebRTC Token', e);
     }
     return null;
   }
@@ -45,25 +45,25 @@ class WebRTCVoiceService {
   /// Connects to the WebRTC LiveKit Room for real-time audio streaming
   Future<bool> startVoiceSession(String callId, {String? livekitUrl}) async {
     try {
-      AppLogger.info('Starting WebRTC Voice Session for callId: $callId');
+      AppLogger.logger.i('Starting WebRTC Voice Session for callId: $callId');
 
       final tokenData = await _fetchWebRTCToken(callId);
       if (tokenData == null) {
-        AppLogger.error('Cannot start WebRTC session: Token fetch failed');
+        AppLogger.logger.e('Cannot start WebRTC session: Token fetch failed');
         return false;
       }
 
       final token = tokenData['token']!;
-      final url = livekitUrl ?? AppConfig.wsBaseUrl.replaceAll('ws://', 'ws://').replaceAll('wss://', 'wss://');
+      final url = livekitUrl ?? AppConfig.websocketUrl;
 
       _room = Room();
 
       // Setup Event Listeners
       _room!.events.listen((event) {
         if (event is TrackSubscribedEvent) {
-          AppLogger.info('🟢 WebRTC Track Subscribed: ${event.track.sid}');
+          AppLogger.logger.i('🟢 WebRTC Track Subscribed: ${event.track.sid}');
         } else if (event is RoomDisconnectedEvent) {
-          AppLogger.info('🔴 WebRTC Room Disconnected');
+          AppLogger.logger.i('🔴 WebRTC Room Disconnected');
           _isConnected = false;
         }
       });
@@ -84,10 +84,10 @@ class WebRTCVoiceService {
       await _room!.localParticipant?.setMicrophoneEnabled(true);
       _isConnected = true;
 
-      AppLogger.info('🚀 WebRTC Voice Session Established & Microphone Streaming Active!');
+      AppLogger.logger.i('🚀 WebRTC Voice Session Established & Microphone Streaming Active!');
       return true;
     } catch (e) {
-      AppLogger.error('Error in WebRTC Voice Session', error: e);
+      AppLogger.logger.e('Error in WebRTC Voice Session', e);
       _isConnected = false;
       return false;
     }
@@ -97,15 +97,15 @@ class WebRTCVoiceService {
   Future<void> stopVoiceSession() async {
     try {
       if (_room != null) {
-        AppLogger.info('Stopping WebRTC Voice Session...');
+        AppLogger.logger.i('Stopping WebRTC Voice Session...');
         await _room!.disconnect();
         await _room!.dispose();
         _room = null;
       }
       _isConnected = false;
-      AppLogger.info('WebRTC Voice Session Stopped.');
+      AppLogger.logger.i('WebRTC Voice Session Stopped.');
     } catch (e) {
-      AppLogger.error('Error stopping WebRTC Voice Session', error: e);
+      AppLogger.logger.e('Error stopping WebRTC Voice Session', e);
     }
   }
 }

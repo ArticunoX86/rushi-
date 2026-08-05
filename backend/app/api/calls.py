@@ -4,6 +4,7 @@ from fastapi import (
     APIRouter,
     Depends,
     HTTPException,
+    Body,
 )
 
 from sqlalchemy.orm import Session
@@ -247,19 +248,39 @@ def send_whisper_hint(
 @router.post("/{call_id}/takeover")
 def force_call_takeover(
     call_id: UUID,
+    target_number: str = Body("+1-800-NEXA-VIP", embed=True),
     db: Session = Depends(get_db),
 ):
-    from app.services.device_connection_manager import device_manager
-    import asyncio
+    from app.services.tata_telephony_service import tata_telephony_service
     
-    # Broadcast TAKEOVER command
-    asyncio.create_task(device_manager.broadcast_all({
-        "action": "SUPERVISOR_TAKEOVER",
-        "event": "SUPERVISOR_TAKEOVER",
-        "payload": {
-            "call_id": str(call_id)
-        }
-    }))
-    print(f"[SUPERVISOR CONSOLE] Broadcasted TAKE_OVER request for call {call_id}")
+    # Trigger TATA Smartflo to bridge the call to the Human Supervisor
+    response = tata_telephony_service.transfer_call(str(call_id), target_number=target_number)
     
-    return {"status": "success", "call_id": str(call_id)}
+    print(f"[SUPERVISOR CONSOLE] Call {call_id} has been transferred to a human agent.")
+    
+    return {"status": "success", "call_id": str(call_id), "tata_response": response}
+
+# ==================================================
+# SUPERVISOR SILENT LISTEN-IN MODE
+# ==================================================
+
+@router.get("/{call_id}/listen-token")
+def get_listen_token(
+    call_id: UUID,
+    db: Session = Depends(get_db),
+):
+    from app.services.livekit_service import generate_room_token
+    
+    # Generate a read-only token (can_publish=False) so the supervisor's mic is disabled
+    token = generate_room_token(
+        room_name=str(call_id),
+        participant_identity="supervisor_listener",
+        can_publish=False,
+    )
+    
+    return {
+        "status": "success",
+        "call_id": str(call_id),
+        "token": token,
+        "ws_url": "wss://nexavoice-livekit.example.com", # Placeholder or env var
+    }

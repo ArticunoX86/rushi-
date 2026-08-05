@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/network/dio_client.dart';
 import '../../../core/websocket/websocket_event_router.dart';
@@ -190,7 +192,23 @@ class _AuditConsoleScreenState extends ConsumerState<AuditConsoleScreen> {
         ),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: Colors.blueAccent))
+                                ? ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: 3,
+                          itemBuilder: (context, index) {
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 16),
+                              height: 100,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade200,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ).animate(onPlay: (c) => c.repeat()).shimmer(
+                              duration: 1200.ms,
+                              color: Colors.white.withOpacity(0.6),
+                            );
+                          },
+                        )
           : _activeCall == null
               ? _buildEmptyConsole()
               : _buildAuditingConsole(),
@@ -428,7 +446,10 @@ class _AuditConsoleScreenState extends ConsumerState<AuditConsoleScreen> {
 
                   // Takeover Button
                   ElevatedButton.icon(
-                    onPressed: _takeoverCall,
+                    onPressed: () {
+                      HapticFeedback.heavyImpact();
+                      _takeoverCall();
+                    },
                     icon: const Icon(Icons.contact_phone, color: Colors.white, size: 18),
                     label: const Text("Take Over Live Call"),
                     style: ElevatedButton.styleFrom(

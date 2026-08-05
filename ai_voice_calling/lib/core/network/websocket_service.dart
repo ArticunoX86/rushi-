@@ -8,6 +8,7 @@ import '../logger/app_logger.dart';
 import '../websocket/websocket_event.dart';
 import '../websocket/websocket_event_parser.dart';
 import '../websocket/websocket_event_router.dart';
+import '../notifications/push_notification_overlay.dart';
 
 class WebSocketService {
   WebSocketService._();
@@ -96,6 +97,10 @@ class WebSocketService {
       AppLogger.logger.i(
         "Parsed Event: ${event.type}",
       );
+
+      if (json['action'] == 'HOT_LEAD_ALERT' || json['event'] == 'HOT_LEAD_ALERT') {
+        NotificationEventBus.fire(json['payload'] ?? {});
+      }
 
       WebSocketEventRouter.instance.dispatch(
         event,

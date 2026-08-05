@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 import '../providers/dashboard_providers.dart';
 import 'widgets/application_card.dart';
@@ -133,6 +134,7 @@ class DashboardScreen extends ConsumerWidget {
 
                 CurrentCallCard(
                   status: data.currentCallStatus,
+                  activeCallId: data.activeCallId,
                 ),
 
                 const SizedBox(height: 20),
@@ -146,7 +148,7 @@ class DashboardScreen extends ConsumerWidget {
                 ),
 
                 const SizedBox(height: 40),
-              ],
+              ].animate(interval: 60.ms).fade(duration: 500.ms).slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
             ),
           ),
         );
