@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../api';
 import { Users, Shield, Plus, Edit, Trash2 } from 'lucide-react';
+import Modal from '../components/Modal';
 import './Shared.css';
 
 const Settings = () => {
@@ -18,13 +19,17 @@ const Settings = () => {
     first_name: '', last_name: '', email: '', phone: '', password: '', role_id: ''
   });
 
+  // Edit States
+  const [editingUser, setEditingUser] = useState(null);
+  const [editingRole, setEditingRole] = useState(null);
+
   // New Role Form State
   const [newRole, setNewRole] = useState({
     name: '', description: '', permissions: []
   });
 
   const availablePermissions = [
-    'manage_users', 'manage_roles', 'view_dashboard', 'manage_properties', 
+    'application_access', 'manage_users', 'manage_roles', 'view_dashboard', 'manage_properties', 
     'manage_leads', 'manage_calls', 'manage_agents', 'view_logs'
   ];
 
@@ -97,13 +102,46 @@ const Settings = () => {
     }
   };
 
-  const handlePermissionToggle = (perm) => {
-    setNewRole(prev => ({
-      ...prev,
-      permissions: prev.permissions.includes(perm) 
-        ? prev.permissions.filter(p => p !== perm)
-        : [...prev.permissions, perm]
-    }));
+  const handleUpdateUser = async (e) => {
+    e.preventDefault();
+    try {
+      const payload = { ...editingUser };
+      if (!payload.password) delete payload.password;
+      await api.put(`/users/${editingUser.id}`, payload);
+      setEditingUser(null);
+      fetchData();
+    } catch (err) {
+      alert(err.response?.data?.detail || "Failed to update user.");
+    }
+  };
+
+  const handleUpdateRole = async (e) => {
+    e.preventDefault();
+    try {
+      await api.put(`/roles/${editingRole.id}`, editingRole);
+      setEditingRole(null);
+      fetchData();
+    } catch (err) {
+      alert(err.response?.data?.detail || "Failed to update role.");
+    }
+  };
+
+  const handlePermissionToggle = (perm, isEditing = false) => {
+    if (isEditing) {
+      setEditingRole(prev => ({
+        ...prev,
+        permissions: prev.permissions.includes(perm)
+          ? prev.permissions.filter(p => p !== perm)
+          : [...prev.permissions, perm]
+      }));
+    } else {
+      setNewRole(prev => ({
+        ...prev,
+        permissions: prev.permissions.includes(perm) 
+          ? prev.permissions.filter(p => p !== perm)
+          : [...prev.permissions, perm]
+      }));
+    }
   };
 
   return (
@@ -211,7 +249,7 @@ const Settings = () => {
                           </span>
                         </td>
                         <td className="actions-cell">
-                          <button className="icon-btn edit"><Edit size={16} /></button>
+                          <button className="icon-btn edit" onClick={() => setEditingUser(user)}><Edit size={16} /></button>
                           <button className="icon-btn delete" onClick={() => handleDeleteUser(user.id)}><Trash2 size={16} /></button>
                         </td>
                       </tr>
@@ -251,7 +289,7 @@ const Settings = () => {
                           <input 
                             type="checkbox" 
                             checked={newRole.permissions.includes(perm)}
-                            onChange={() => handlePermissionToggle(perm)}
+                            onChange={() => handlePermissionToggle(perm, false)}
                           />
                           <span>{perm}</span>
                         </label>
@@ -293,7 +331,7 @@ const Settings = () => {
                           </div>
                         </td>
                         <td className="actions-cell">
-                          <button className="icon-btn edit"><Edit size={16} /></button>
+                          <button className="icon-btn edit" onClick={() => setEditingRole(role)}><Edit size={16} /></button>
                           <button className="icon-btn delete" onClick={() => handleDeleteRole(role.id)}><Trash2 size={16} /></button>
                         </td>
                       </tr>
@@ -305,6 +343,88 @@ const Settings = () => {
           </div>
         )}
       </div>
+
+      {/* Edit User Modal */}
+      <Modal isOpen={!!editingUser} onClose={() => setEditingUser(null)} title="Edit Member">
+        {editingUser && (
+          <form onSubmit={handleUpdateUser} className="inline-form" style={{ padding: '1rem' }}>
+            <div className="form-grid">
+              <div className="form-group input-group">
+                <label className="input-label">First Name</label>
+                <input className="input-field" required type="text" value={editingUser.first_name} onChange={e => setEditingUser({...editingUser, first_name: e.target.value})} />
+              </div>
+              <div className="form-group input-group">
+                <label className="input-label">Last Name</label>
+                <input className="input-field" required type="text" value={editingUser.last_name} onChange={e => setEditingUser({...editingUser, last_name: e.target.value})} />
+              </div>
+              <div className="form-group input-group">
+                <label className="input-label">Email</label>
+                <input className="input-field" required type="email" value={editingUser.email} onChange={e => setEditingUser({...editingUser, email: e.target.value})} />
+              </div>
+              <div className="form-group input-group">
+                <label className="input-label">Phone</label>
+                <input className="input-field" required type="text" value={editingUser.phone} onChange={e => setEditingUser({...editingUser, phone: e.target.value})} />
+              </div>
+              <div className="form-group input-group">
+                <label className="input-label">Status</label>
+                <select className="input-field" value={editingUser.is_active} onChange={e => setEditingUser({...editingUser, is_active: e.target.value === 'true'})}>
+                  <option value="true">Active</option>
+                  <option value="false">Inactive</option>
+                </select>
+              </div>
+              <div className="form-group input-group">
+                <label className="input-label">Role</label>
+                <select className="input-field" value={editingUser.role_id} onChange={e => setEditingUser({...editingUser, role_id: e.target.value})}>
+                  {roles.map(r => (
+                    <option key={r.id} value={r.id} className="select-option">{r.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="form-actions" style={{ marginTop: '1.5rem' }}>
+              <button type="button" className="btn" onClick={() => setEditingUser(null)}>Cancel</button>
+              <button type="submit" className="btn btn-primary">Save Changes</button>
+            </div>
+          </form>
+        )}
+      </Modal>
+
+      {/* Edit Role Modal */}
+      <Modal isOpen={!!editingRole} onClose={() => setEditingRole(null)} title="Edit Role">
+        {editingRole && (
+          <form onSubmit={handleUpdateRole} className="inline-form" style={{ padding: '1rem' }}>
+            <div className="form-grid">
+              <div className="form-group input-group">
+                <label className="input-label">Role Name</label>
+                <input className="input-field" required type="text" value={editingRole.name} onChange={e => setEditingRole({...editingRole, name: e.target.value})} />
+              </div>
+              <div className="form-group input-group">
+                <label className="input-label">Description</label>
+                <input className="input-field" type="text" value={editingRole.description} onChange={e => setEditingRole({...editingRole, description: e.target.value})} />
+              </div>
+            </div>
+            <div className="form-group input-group" style={{ marginTop: '1rem' }}>
+              <label className="input-label">Permissions</label>
+              <div className="permissions-grid">
+                {availablePermissions.map(perm => (
+                  <label key={perm} className="checkbox-label">
+                    <input 
+                      type="checkbox" 
+                      checked={editingRole.permissions?.includes(perm)}
+                      onChange={() => handlePermissionToggle(perm, true)}
+                    />
+                    <span>{perm}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div className="form-actions" style={{ marginTop: '1.5rem' }}>
+              <button type="button" className="btn" onClick={() => setEditingRole(null)}>Cancel</button>
+              <button type="submit" className="btn btn-primary">Update Role</button>
+            </div>
+          </form>
+        )}
+      </Modal>
     </div>
   );
 };

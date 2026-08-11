@@ -1,7 +1,13 @@
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .page-container {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  animation: fadeSlideUp 0.3s ease-out forwards;
 }
 
 .flex-between {
@@ -43,11 +49,13 @@
 }
 
 .data-table tbody tr {
-  transition: background-color var(--transition-fast);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .data-table tbody tr:hover {
-  background-color: rgba(255, 255, 255, 0.02);
+  background-color: rgba(255, 255, 255, 0.04);
+  transform: scale(1.005) translateX(4px);
+  box-shadow: -2px 0 0 0 var(--accent-primary);
 }
 
 .loading, .empty-state {
@@ -96,11 +104,13 @@
 .tag {
   background: rgba(99, 102, 241, 0.1);
   color: #818cf8;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 500;
   border: 1px solid rgba(99, 102, 241, 0.2);
+  display: inline-flex;
+  align-items: center;
 }
 
 .form-container {
@@ -214,6 +224,14 @@ select.input-field option {
 }
 
 .actions-cell {
-  display: flex;
-  gap: 0.5rem;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.actions-cell > * {
+  margin-right: 0.5rem;
+}
+
+.actions-cell > *:last-child {
+  margin-right: 0;
 }

@@ -145,8 +145,8 @@ const VoiceAgents = () => {
             <label className="input-label">Provider</label>
             <select name="provider" className="input-field" value={formData.provider} onChange={handleInputChange}>
               <option value="ElevenLabs">ElevenLabs</option>
+              <option value="Cartesia">Cartesia</option>
               <option value="OpenAI">OpenAI (TTS)</option>
-              <option value="PlayHT">Play.ht</option>
             </select>
           </div>
 
@@ -156,6 +156,7 @@ const VoiceAgents = () => {
               <option value="rachel">Rachel (Female, Calm)</option>
               <option value="drew">Drew (Male, Professional)</option>
               <option value="emily">Emily (Female, Energetic)</option>
+              <option value="cartesia_en_1">Cartesia British (Male)</option>
             </select>
           </div>
 
@@ -173,9 +174,15 @@ const VoiceAgents = () => {
             />
           </div>
 
-          <div className="input-group checkbox-label" style={{ gridColumn: 'span 2', display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
-            <input type="checkbox" name="is_active" id="is_active" checked={formData.is_active} onChange={handleInputChange} />
-            <label htmlFor="is_active" style={{ cursor: 'pointer' }}>Set as Active Agent</label>
+          <div className="input-group checkbox-label" style={{ gridColumn: 'span 2', display: 'flex', alignItems: 'center', gap: '1.5rem', marginTop: '0.5rem' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+              <input type="checkbox" name="is_active" id="is_active" checked={formData.is_active} onChange={handleInputChange} />
+              <span>Set as Active Agent</span>
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+              <input type="checkbox" name="interruptible" id="interruptible" checked={formData.interruptible || true} onChange={handleInputChange} />
+              <span>Allow User Interruption</span>
+            </label>
           </div>
 
           <div style={{ gridColumn: 'span 2', display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem' }}>

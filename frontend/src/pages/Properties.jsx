@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Edit } from 'lucide-react';
 import Modal from '../components/Modal';
 import './Shared.css';
 
@@ -8,6 +8,8 @@ const Properties = () => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     property_type: 'RESIDENTIAL',
@@ -54,8 +56,14 @@ const Properties = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/properties', formData);
+      if (isEditing) {
+        await api.put(`/properties/${editingId}`, formData);
+      } else {
+        await api.post('/properties', formData);
+      }
       setIsModalOpen(false);
+      setIsEditing(false);
+      setEditingId(null);
       setFormData({
         title: '', property_type: 'RESIDENTIAL', listing_type: 'SALE', status: 'AVAILABLE',
         city: '', locality: '', address: '', price: '', bedrooms: 0, bathrooms: 0, area_sqft: 0,
@@ -63,8 +71,27 @@ const Properties = () => {
       });
       fetchProperties();
     } catch (error) {
-      console.error('Failed to add property', error);
+      console.error('Failed to save property', error);
+      alert('Failed to save property. Please check inputs.');
     }
+  };
+
+  const handleEditClick = (prop) => {
+    setFormData(prop);
+    setEditingId(prop.id);
+    setIsEditing(true);
+    setIsModalOpen(true);
+  };
+
+  const handleAddClick = () => {
+    setFormData({
+      title: '', property_type: 'RESIDENTIAL', listing_type: 'SALE', status: 'AVAILABLE',
+      city: '', locality: '', address: '', price: '', bedrooms: 0, bathrooms: 0, area_sqft: 0,
+      furnishing: 'UNFURNISHED', owner_name: '', owner_phone: ''
+    });
+    setIsEditing(false);
+    setEditingId(null);
+    setIsModalOpen(true);
   };
 
   const handleDelete = async (id) => {
@@ -84,7 +111,7 @@ const Properties = () => {
           <h1>Properties</h1>
           <p className="text-secondary">Manage real estate listings and portfolios.</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
+        <button className="btn btn-primary" onClick={handleAddClick}>
           <Plus size={16} /> Add Property
         </button>
       </header>
@@ -119,8 +146,11 @@ const Properties = () => {
                     </span>
                   </td>
                   <td>
-                    <button className="icon-btn" onClick={() => handleDelete(prop.id)}>
-                      <Trash2 size={16} color="var(--danger)" />
+                    <button className="icon-btn edit" onClick={() => handleEditClick(prop)}>
+                      <Edit size={16} />
+                    </button>
+                    <button className="icon-btn delete" onClick={() => handleDelete(prop.id)}>
+                      <Trash2 size={16} />
                     </button>
                   </td>
                 </tr>
@@ -130,7 +160,7 @@ const Properties = () => {
         )}
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Add New Property">
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={isEditing ? "Edit Property" : "Add New Property"}>
         <form onSubmit={handleSubmit} className="grid grid-cols-2">
           
           <div className="input-group" style={{ gridColumn: 'span 2' }}>
