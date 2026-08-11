@@ -1,11 +1,11 @@
 import datetime
 
-from sqlalchemy import Boolean, DateTime, Enum, String
-from sqlalchemy.orm import Mapped, mapped_column
+import uuid
+from sqlalchemy import Boolean, DateTime, String, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.base import Base
 from app.database.base_model import TimestampMixin
-from app.models.enums import UserRole
 
 
 class User(Base, TimestampMixin):
@@ -43,14 +43,12 @@ class User(Base, TimestampMixin):
         nullable=False,
     )
 
-    role: Mapped[UserRole] = mapped_column(
-        Enum(
-            UserRole,
-            name="user_role",
-        ),
-        default=UserRole.SALES_EXECUTIVE,
+    role_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("roles.id"),
         nullable=False,
     )
+
+    role = relationship("Role", back_populates="users")
 
     is_active: Mapped[bool] = mapped_column(
         Boolean,
@@ -63,10 +61,20 @@ class User(Base, TimestampMixin):
         nullable=True,
     )
 
+    otp_code: Mapped[str | None] = mapped_column(
+        String(6),
+        nullable=True,
+    )
+
+    otp_expires_at: Mapped[datetime.datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+
     def __repr__(self) -> str:
         return (
             f"<User("
             f"email='{self.email}', "
-            f"role='{self.role.value}', "
+            f"role_id='{self.role_id}', "
             f"active={self.is_active})>"
         )

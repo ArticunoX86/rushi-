@@ -13,6 +13,11 @@ router = APIRouter(
     tags=["logs"],
 )
 
+@router.get("")
+def get_logs(db: Session = Depends(get_db)):
+    logs = db.query(AppLog).order_by(AppLog.timestamp.desc()).limit(100).all()
+    return [{"timestamp": str(l.timestamp), "level": l.log_level, "message": l.message} for l in logs]
+
 class LogEntry(BaseModel):
     log_level: str
     message: str

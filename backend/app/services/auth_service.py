@@ -12,12 +12,13 @@ from app.crud.user import (
     update_last_login,
 )
 from app.models.user import User
-from app.models.enums import UserRole
+from app.models.role import Role
 from app.schemas.auth import (
     LoginRequest,
     LoginResponse,
     RegisterRequest,
 )
+from app.core.logger import logger
 
 
 class AuthService:
@@ -25,32 +26,6 @@ class AuthService:
     Authentication business logic.
     """
 
-    @staticmethod
-    def register(db: Session, data: RegisterRequest) -> User:
-        """
-        Register a new user.
-        """
-
-        # Check email
-        if get_user_by_email(db, data.email):
-            raise ValueError("Email already exists.")
-
-        # Check phone
-        if get_user_by_phone(db, data.phone):
-            raise ValueError("Phone number already exists.")
-
-        # Create user object
-        user = User(
-            first_name=data.first_name,
-            last_name=data.last_name,
-            email=data.email,
-            phone=data.phone,
-            password_hash=hash_password(data.password),
-            role=UserRole.SALES_EXECUTIVE,
-            is_active=True,
-        )
-
-        return create_user(db, user)
 
     @staticmethod
     def login(db: Session, data: LoginRequest) -> LoginResponse:

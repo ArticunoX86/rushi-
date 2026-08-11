@@ -1,4 +1,5 @@
 from app.models.user import User
+from app.models.role import Role
 
 from app.models.property import Property
 
@@ -28,6 +29,7 @@ __all__ = [
 
     "Device",
 
+    "Role",
     "AppLog",
 
 ]

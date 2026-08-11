@@ -6,39 +6,19 @@ from app.core.dependencies import get_current_user
 from app.database.session import get_db
 from app.models.user import User
 from app.schemas.auth import (
+    TokenResponse,
     LoginRequest,
     LoginResponse,
     RegisterRequest,
-    UserResponse,
+    MessageResponse,
 )
+from app.schemas.user import UserResponse
 from app.services.auth_service import AuthService
 
 router = APIRouter(
     prefix="/auth",
     tags=["Authentication"],
 )
-
-
-@router.post(
-    "/register",
-    response_model=UserResponse,
-    status_code=status.HTTP_201_CREATED,
-)
-def register(
-    data: RegisterRequest,
-    db: Session = Depends(get_db),
-):
-    """
-    Register a new user.
-    """
-    try:
-        return AuthService.register(db, data)
-
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
-        )
 
 
 @router.post(
@@ -68,6 +48,9 @@ def login(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=str(e),
         )
+
+
+
 
 
 @router.get(

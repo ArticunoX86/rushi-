@@ -3,9 +3,8 @@ import enum
 
 
 class UserRole(str, Enum):
-    ADMIN = "ADMIN"
-    SALES_MANAGER = "SALES_MANAGER"
-    SALES_EXECUTIVE = "SALES_EXECUTIVE"
+    SYSTEM_ADMINISTRATOR = "SYSTEM_ADMINISTRATOR"
+    CLIENT_HEAD = "CLIENT_HEAD"
 
 class PropertyType(str, Enum):
     APARTMENT = "APARTMENT"

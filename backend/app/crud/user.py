@@ -43,6 +43,17 @@ def get_user_by_phone(
     )
 
 
+def get_users(
+    db: Session,
+    skip: int = 0,
+    limit: int = 100,
+) -> list[User]:
+    """
+    Get a list of users.
+    """
+    return db.query(User).offset(skip).limit(limit).all()
+
+
 def create_user(
     db: Session,
     user: User,

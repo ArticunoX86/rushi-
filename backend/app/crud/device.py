@@ -121,19 +121,22 @@ def get_device_by_identifier(
 # ==================================================
 
 def get_devices(
-
     db: Session,
-
 ):
+    devices = db.query(Device).all()
+    now = datetime.utcnow()
+    updated = False
+    for d in devices:
+        if d.status == DeviceStatus.ONLINE and d.last_seen:
+            # If not seen in 60 seconds, mark as offline
+            if (now - d.last_seen.replace(tzinfo=None)).total_seconds() > 60:
+                d.status = DeviceStatus.OFFLINE
+                updated = True
+    
+    if updated:
+        db.commit()
 
-
-    return (
-
-        db.query(Device)
-
-        .all()
-
-    )
+    return devices
 
 
 
@@ -142,24 +145,19 @@ def get_devices(
 # ==================================================
 
 def get_available_device(
-
     db: Session,
-
 ):
-
-
+    # First update stale devices
+    get_devices(db)
+    
     return (
-
         db.query(Device)
-
         .filter(
             Device.status
             ==
             DeviceStatus.ONLINE
         )
-
         .first()
-
     )
 
 

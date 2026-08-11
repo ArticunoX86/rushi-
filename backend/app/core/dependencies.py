@@ -58,3 +58,24 @@ def get_current_user(
         )
 
     return user
+
+class RequirePermissions:
+    def __init__(self, required_permissions: list[str]):
+        self.required_permissions = set(required_permissions)
+
+    def __call__(self, current_user: User = Depends(get_current_user)) -> User:
+        if not current_user.role:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="User has no role assigned."
+            )
+        
+        user_permissions = set(current_user.role.permissions)
+        
+        if not self.required_permissions.issubset(user_permissions):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not enough permissions."
+            )
+            
+        return current_user

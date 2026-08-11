@@ -7,6 +7,10 @@ router = APIRouter(
     tags=["WebRTC AI Streaming"],
 )
 
+@router.get("")
+def get_webrtc_sessions():
+    return []
+
 class TokenRequest(BaseModel):
     call_id: str
     identity: str = "mobile_client"

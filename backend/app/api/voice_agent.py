@@ -60,6 +60,15 @@ class VoiceAgentRequest(BaseModel):
 
 
 # ==================================================
+# GET ALL AGENTS (MOCK)
+# ==================================================
+
+@router.get("")
+def get_voice_agents():
+    # Return empty list or mock data to satisfy frontend
+    return []
+
+# ==================================================
 # PROCESS COMPLETE AI CALL
 # ==================================================
 
