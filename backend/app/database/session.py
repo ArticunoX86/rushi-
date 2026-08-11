@@ -3,6 +3,9 @@ from sqlalchemy.orm import sessionmaker
 
 from app.core.config import settings
 
+# Import multitenancy to register the SQLAlchemy event listener
+import app.database.multitenancy
+
 
 engine = create_engine(
     settings.DATABASE_URL,

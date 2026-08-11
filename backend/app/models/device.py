@@ -1,8 +1,9 @@
 import uuid
+from sqlalchemy import ForeignKey
 
 from datetime import datetime
 
-from sqlalchemy import (
+from sqlalchemy import ForeignKey, (
     String,
     DateTime,
     Enum,
@@ -29,6 +30,7 @@ class Device(
     """
 
     __tablename__ = "devices"
+    tenant_id = mapped_column(ForeignKey('tenants.id'), nullable=True)
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),

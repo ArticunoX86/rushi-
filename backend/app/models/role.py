@@ -1,5 +1,6 @@
 import uuid
-from sqlalchemy import String, Text
+from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import JSONB
 
@@ -12,6 +13,7 @@ class Role(Base, TimestampMixin):
     """
 
     __tablename__ = "roles"
+    tenant_id = mapped_column(ForeignKey('tenants.id'), nullable=True)
 
     name: Mapped[str] = mapped_column(
         String(100),

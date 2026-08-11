@@ -9,6 +9,7 @@ class UserBase(BaseModel):
     email: EmailStr
     phone: str
     is_active: bool = True
+    is_superadmin: bool = False
     role_id: UUID
 
 class UserCreate(UserBase):

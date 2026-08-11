@@ -1,6 +1,7 @@
 import datetime
 
 import uuid
+from sqlalchemy import ForeignKey
 from sqlalchemy import Boolean, DateTime, String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -14,6 +15,7 @@ class User(Base, TimestampMixin):
     """
 
     __tablename__ = "users"
+    tenant_id = mapped_column(ForeignKey('tenants.id'), nullable=True)
 
     first_name: Mapped[str] = mapped_column(
         String(100),
@@ -53,6 +55,12 @@ class User(Base, TimestampMixin):
     is_active: Mapped[bool] = mapped_column(
         Boolean,
         default=True,
+        nullable=False,
+    )
+
+    is_superadmin: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False,
         nullable=False,
     )
 

@@ -47,6 +47,9 @@ class AuthService:
         if not user.is_active:
             raise ValueError("User account is inactive.")
 
+        if user.role.name != "System Administrator" and "application_access" not in user.role.permissions:
+            raise ValueError("Access denied. You do not have permission to access the application.")
+
         token = create_access_token(
             subject=str(user.id),
         )

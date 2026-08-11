@@ -1,4 +1,5 @@
 import uuid
+from sqlalchemy import ForeignKey
 from decimal import Decimal
 from datetime import datetime
 
@@ -32,6 +33,7 @@ class Lead(Base, TimestampMixin):
     """
 
     __tablename__ = "leads"
+    tenant_id = mapped_column(ForeignKey('tenants.id'), nullable=True)
 
 
     # ==================================================

@@ -24,7 +24,7 @@ def get_user_by_email(
     """
     return (
         db.query(User)
-        .filter(User.email == email)
+        .filter(User.email.ilike(email))
         .first()
     )
 

@@ -13,7 +13,7 @@ from app.models.device import Device
 
 from app.models.app_log import AppLog
 
-
+from app.models.tenant import Tenant
 
 __all__ = [
 
@@ -31,5 +31,7 @@ __all__ = [
 
     "Role",
     "AppLog",
+
+    "Tenant",
 
 ]

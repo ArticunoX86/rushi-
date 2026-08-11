@@ -1,4 +1,5 @@
 import uuid
+from sqlalchemy import ForeignKey
 
 from sqlalchemy import (
     String,
@@ -28,6 +29,7 @@ class Call(Base, TimestampMixin):
     """
 
     __tablename__ = "calls"
+    tenant_id = mapped_column(ForeignKey('tenants.id'), nullable=True)
 
 
     id: Mapped[uuid.UUID] = mapped_column(

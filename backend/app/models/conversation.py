@@ -1,4 +1,5 @@
 import uuid
+from sqlalchemy import ForeignKey
 
 from sqlalchemy import (
     Text,
@@ -35,6 +36,7 @@ class Conversation(
     """
 
     __tablename__ = "conversations"
+    tenant_id = mapped_column(ForeignKey('tenants.id'), nullable=True)
 
 
 

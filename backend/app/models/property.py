@@ -28,6 +28,7 @@ class Property(Base, TimestampMixin):
     """
 
     __tablename__ = "properties"
+    tenant_id = mapped_column(ForeignKey('tenants.id'), nullable=True)
 
 
     # ==================================================

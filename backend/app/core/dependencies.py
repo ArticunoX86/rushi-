@@ -46,6 +46,8 @@ def get_current_user(
     except (JWTError, ValueError):
         raise credentials_exception
 
+    from app.database.multitenancy import set_current_tenant_id
+    
     user = get_user_by_id(db, user_id)
 
     if user is None:
@@ -56,6 +58,9 @@ def get_current_user(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="User account is inactive.",
         )
+
+    # Set the multitenancy context
+    set_current_tenant_id(user.tenant_id)
 
     return user
 
