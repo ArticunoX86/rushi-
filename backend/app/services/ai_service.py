@@ -133,13 +133,55 @@ def process_customer_message(
 
     whisper_hint = active_whispers.pop(str(request.call_id), None)
     
+    # Fetch active Voice Agent from DB to use its prompt
+    from app.crud.voice_agent import voice_agent as crud_voice_agent
+    active_agents = crud_voice_agent.get_active(db)
+    agent_prompt = active_agents[0].prompt if active_agents else None
+    
+    # ==================================================
+    # Fetch Relevant Training Data (Category-Filtered)
+    # ==================================================
+    from app.crud.ai_training_data import ai_training_data as crud_training
+    
+    # Extract keywords from the customer message for smart injection
+    customer_message_lower = request.message.lower()
+    intent_keywords = []
+    objection_keywords = ["not interested", "no thanks", "busy", "call later", "expensive",
+                          "budget", "too much", "family", "wife", "discuss", "location", "area",
+                          "loan", "emi", "possess", "ready", "rera", "visit", "see"]
+    for kw in objection_keywords:
+        if kw in customer_message_lower:
+            intent_keywords.append(kw)
+    
+    relevant_entries = crud_training.get_relevant(db, intent_keywords)
+    training_context = [
+        {
+            "category": e.category.value if e.category else "",
+            "title": e.title,
+            "trigger_phrase": e.trigger_phrase or "",
+            "situation_context": e.situation_context or "",
+            "ideal_response": e.ideal_response,
+        }
+        for e in relevant_entries
+    ]
+    training_entry_ids = [e.id for e in relevant_entries]
+    
     # SINGLE API CALL: Extracts CRM data AND generates response
     ai_result = process_conversation_turn(
         history=history_lines,
         customer_message=request.message,
         lead_info=lead_info,
-        whisper_hint=whisper_hint
+        whisper_hint=whisper_hint,
+        system_prompt=agent_prompt,
+        training_context=training_context,
     )
+    
+    # Track usage of injected training entries
+    if training_entry_ids:
+        try:
+            crud_training.increment_usage(db, training_entry_ids)
+        except Exception as e:
+            print("Failed to track training entry usage:", e)
     
     extracted = ai_result.get("crm_update", {})
     reply = ai_result.get("conversational_reply", "I understand. Give me a moment to check.")
@@ -148,12 +190,41 @@ def process_customer_message(
     # Update Lead CRM Automatically
     # ==================================================
 
+    def parse_budget(raw):
+        """Convert Indian currency strings like '1 Crore', '50 Lakhs' to numeric."""
+        if raw is None:
+            return None
+        if isinstance(raw, (int, float)):
+            return raw
+        s = str(raw).strip().lower().replace(",", "").replace("₹", "").replace("rs", "").replace("inr", "").strip()
+        try:
+            # Direct numeric
+            return float(s)
+        except ValueError:
+            pass
+        import re
+        m = re.search(r'([\d.]+)\s*(crore|cr|crores)', s)
+        if m:
+            return float(m.group(1)) * 10000000
+        m = re.search(r'([\d.]+)\s*(lakh|lakhs|lac|lacs|l)', s)
+        if m:
+            return float(m.group(1)) * 100000
+        m = re.search(r'([\d.]+)\s*(k|thousand)', s)
+        if m:
+            return float(m.group(1)) * 1000
+        m = re.search(r'[\d.]+', s)
+        if m:
+            return float(m.group(0))
+        return None
+
     if extracted.get("city"):
         lead.preferred_city = extracted.get("city")
     if extracted.get("bedrooms"):
         lead.bedrooms = extracted.get("bedrooms")
     if extracted.get("budget"):
-        lead.budget_max = extracted.get("budget")
+        parsed = parse_budget(extracted.get("budget"))
+        if parsed is not None:
+            lead.budget_max = parsed
     if extracted.get("summary"):
         lead.conversation_summary = extracted.get("summary")
 

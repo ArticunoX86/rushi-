@@ -14,6 +14,9 @@ from app.models.device import Device
 from app.models.app_log import AppLog
 
 from app.models.tenant import Tenant
+from app.models.voice_agent import VoiceAgent
+from app.models.campaign import Campaign
+from app.models.ai_training_data import AITrainingData, TrainingCategory
 
 __all__ = [
 
@@ -33,5 +36,8 @@ __all__ = [
     "AppLog",
 
     "Tenant",
-
+    "VoiceAgent",
+    "Campaign",
+    "AITrainingData",
+    "TrainingCategory",
 ]

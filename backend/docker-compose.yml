@@ -46,6 +46,7 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
+      - ../frontend/dist:/var/www/frontend:ro
     depends_on:
       - backend
     restart: unless-stopped

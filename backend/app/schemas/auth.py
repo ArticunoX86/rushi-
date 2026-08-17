@@ -30,3 +30,12 @@ class MessageResponse(BaseModel):
 class LoginResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+class ProfileUpdateRequest(BaseModel):
+    first_name: str | None = None
+    last_name: str | None = None
+    phone: str | None = None
+
+class PasswordUpdateRequest(BaseModel):
+    current_password: str
+    new_password: str

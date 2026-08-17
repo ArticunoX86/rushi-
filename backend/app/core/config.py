@@ -89,7 +89,7 @@ class Settings(BaseSettings):
     # ==========================================================
     # AI Configuration
     # ==========================================================
-    AI_MODEL: str = "gemini-2.0-flash"
+    AI_MODEL: str = "gemini-flash-latest"
     AI_TEMPERATURE: float = 0.4
     AI_MAX_TOKENS: int = 1000
 

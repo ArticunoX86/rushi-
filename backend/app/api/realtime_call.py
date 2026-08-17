@@ -248,7 +248,15 @@ async def realtime_call(
         try:
             greeting_name = lead.first_name if (lead and lead.first_name and lead.first_name != "string") else "there"
             city_name = lead.preferred_city if (lead and lead.preferred_city and lead.preferred_city.lower() != "string") else "the area"
-            intro_text = f"Hi {greeting_name}, how's it going? I'm calling because I saw you looking at some properties recently. Are you still searching for a place in {city_name}?"
+            
+            # Fetch active voice agent to get the dynamic first_message
+            from app.models.voice_agent import VoiceAgent
+            active_agent = db.query(VoiceAgent).filter(VoiceAgent.is_active == True).first()
+            
+            if active_agent and active_agent.first_message:
+                intro_text = active_agent.first_message.replace("{lead_name}", greeting_name).replace("{city}", city_name)
+            else:
+                intro_text = f"Hi {greeting_name}, how's it going? I'm calling because I saw you looking at some properties recently. Are you still searching for a place in {city_name}?"
             
             save_message(
                 db,

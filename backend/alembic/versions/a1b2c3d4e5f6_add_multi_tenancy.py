@@ -11,9 +11,8 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
-# revision identifiers, used by Alembic.
 revision: str = 'a1b2c3d4e5f6'
-down_revision: Union[str, Sequence[str], None] = '7d434238f73d'
+down_revision: Union[str, Sequence[str], None] = '76bc056b7a97'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -37,18 +36,22 @@ def upgrade() -> None:
     op.add_column('users', sa.Column('is_superadmin', sa.Boolean(), server_default='false', nullable=False))
 
     # Add tenant_id to all tables
-    tables = ['users', 'roles', 'leads', 'properties', 'calls', 'app_logs', 'agent_scripts', 'script_faqs', 'conversations', 'devices']
+    tables = ['users', 'roles', 'leads', 'properties', 'calls', 'app_logs', 'conversations', 'devices']
     
-    # Try to add columns (ignore if table doesn't exist, which might happen based on previous messy migrations)
+    bind = op.get_bind()
+    from sqlalchemy import inspect
+    inspector = inspect(bind)
+    existing_tables = inspector.get_table_names()
+
     for table in tables:
-        try:
+        if table in existing_tables:
             op.add_column(table, sa.Column('tenant_id', postgresql.UUID(as_uuid=True), nullable=True))
             # Set existing records to default tenant
             op.execute(f"UPDATE {table} SET tenant_id = '00000000-0000-0000-0000-000000000000'")
             # Create Foreign Key
             op.create_foreign_key(f"fk_{table}_tenant_id", table, 'tenants', ['tenant_id'], ['id'])
-        except Exception as e:
-            print(f"Skipping {table} due to error: {e}")
+        else:
+            print(f"Skipping {table} because it does not exist.")
 
 def downgrade() -> None:
     tables = ['users', 'roles', 'leads', 'properties', 'calls', 'app_logs', 'agent_scripts', 'script_faqs', 'conversations', 'devices']

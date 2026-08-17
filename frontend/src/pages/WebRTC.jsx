@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Phone, PhoneOff, Mic, MicOff, Volume2, VolumeX, Delete } from 'lucide-react';
-import './Shared.css';
+
 
 const WebRTC = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -46,9 +46,9 @@ const WebRTC = () => {
   };
 
   return (
-    <div className="page-container" style={{ alignItems: 'center', justifyContent: 'center', height: 'calc(100vh - 4rem)' }}>
+    <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ alignItems: 'center', justifyContent: 'center', height: 'calc(100vh - 4rem)' }}>
       
-      <div className="glass" style={{ width: '100%', maxWidth: '400px', padding: '2rem', borderRadius: '24px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 20px 40px rgba(0,0,0,0.3)' }}>
+      <div className="glass-panel rounded-xl shadow-sm border border-[rgba(255,255,255,0.08)] overflow-hidden" style={{ width: '100%', maxWidth: '400px', padding: '2rem', borderRadius: '24px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 20px 40px rgba(0,0,0,0.3)' }}>
         
         {/* Header / Status Indicator */}
         <div>
@@ -67,7 +67,7 @@ const WebRTC = () => {
             {phoneNumber || 'Enter Number'}
           </span>
           {phoneNumber && callStatus === 'IDLE' && (
-            <button className="icon-btn" onClick={handleDelete} style={{ position: 'absolute', right: '10px' }}>
+            <button className="p-1.5 text-muted hover:text-accent-primary hover:bg-[rgba(139,92,246,0.1)] rounded-lg transition-colors" onClick={handleDelete} style={{ position: 'absolute', right: '10px' }}>
               <Delete size={20} />
             </button>
           )}
@@ -101,7 +101,7 @@ const WebRTC = () => {
         {/* Call Controls */}
         <div className="flex-between" style={{ marginTop: '1rem', padding: '0 1rem' }}>
           <button 
-            className="icon-btn" 
+            className="p-1.5 text-muted hover:text-accent-primary hover:bg-[rgba(139,92,246,0.1)] rounded-lg transition-colors" 
             onClick={() => setIsMuted(!isMuted)} 
             style={{ 
               background: isMuted ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255,255,255,0.1)', 
@@ -147,7 +147,7 @@ const WebRTC = () => {
           )}
 
           <button 
-            className="icon-btn" 
+            className="p-1.5 text-muted hover:text-accent-primary hover:bg-[rgba(139,92,246,0.1)] rounded-lg transition-colors" 
             onClick={() => setSpeakerOn(!speakerOn)} 
             style={{ 
               background: !speakerOn ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.1)', 

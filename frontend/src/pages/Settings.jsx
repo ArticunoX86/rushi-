@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../api';
 import { Users, Shield, Plus, Edit, Trash2 } from 'lucide-react';
 import Modal from '../components/Modal';
-import './Shared.css';
+
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('members');
@@ -29,7 +29,7 @@ const Settings = () => {
   });
 
   const availablePermissions = [
-    'application_access', 'manage_users', 'manage_roles', 'view_dashboard', 'manage_properties', 
+    'application_access', 'website_access', 'manage_users', 'manage_roles', 'view_dashboard', 'manage_properties', 
     'manage_leads', 'manage_calls', 'manage_agents', 'view_logs'
   ];
 
@@ -145,23 +145,23 @@ const Settings = () => {
   };
 
   return (
-    <div className="page-container">
-      <div className="page-header">
+    <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex justify-between items-start mb-2">
         <div>
-          <h1>Settings</h1>
-          <p className="text-secondary">Manage platform access and permissions.</p>
+          <h1 className="text-3xl font-bold text-white tracking-tight">Settings</h1>
+          <p className="text-muted mt-1">Manage platform access and permissions.</p>
         </div>
       </div>
 
-      <div className="tabs-container">
+      <div className="flex gap-2 mb-8 bg-[rgba(255,255,255,0.02)] p-1.5 rounded-xl w-max border border-[rgba(255,255,255,0.05)]">
         <button 
-          className={`tab-btn ${activeTab === 'members' ? 'active' : ''}`}
+          className={`px-5 py-2.5 font-medium text-sm rounded-lg flex items-center gap-2 transition-all ${activeTab === 'members' ? 'bg-[rgba(255,255,255,0.1)] text-white shadow-sm' : 'text-muted hover:text-gray-200 hover:bg-[rgba(255,255,255,0.05)]'}`}
           onClick={() => setActiveTab('members')}
         >
           <Users size={18} /> Members
         </button>
         <button 
-          className={`tab-btn ${activeTab === 'roles' ? 'active' : ''}`}
+          className={`px-5 py-2.5 font-medium text-sm rounded-lg flex items-center gap-2 transition-all ${activeTab === 'roles' ? 'bg-[rgba(255,255,255,0.1)] text-white shadow-sm' : 'text-muted hover:text-gray-200 hover:bg-[rgba(255,255,255,0.05)]'}`}
           onClick={() => setActiveTab('roles')}
         >
           <Shield size={18} /> Roles & Permissions
@@ -172,41 +172,41 @@ const Settings = () => {
         {loading ? (
           <div className="loading-state">Loading...</div>
         ) : activeTab === 'members' ? (
-          <div className="glass" style={{ padding: '1.5rem' }}>
+          <div className="glass-panel rounded-xl shadow-sm border border-[rgba(255,255,255,0.08)] overflow-hidden" style={{ padding: '1.5rem' }}>
             <div className="card-header flex-between">
               <h2>Team Members</h2>
-              <button className="btn btn-primary" onClick={() => setShowUserForm(!showUserForm)}>
+              <button className="px-4 py-2 rounded-lg font-medium inline-flex items-center gap-2 bg-accent-primary text-white hover:bg-accent-primary/80 transition-colors shadow-sm" onClick={() => setShowUserForm(!showUserForm)}>
                 <Plus size={16} /> {showUserForm ? 'Cancel' : 'Add Member'}
               </button>
             </div>
 
             {showUserForm && (
-              <div className="form-container">
+              <div className="bg-[rgba(255,255,255,0.02)] p-6 rounded-xl border border-[rgba(255,255,255,0.08)] mb-6">
                 <form onSubmit={handleCreateUser} className="inline-form">
-                  <div className="form-grid">
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="form-group input-group">
-                      <label className="input-label">First Name</label>
-                      <input className="input-field" required type="text" value={newUser.first_name} onChange={e => setNewUser({...newUser, first_name: e.target.value})} />
+                      <label className="text-sm font-medium text-gray-200">First Name</label>
+                      <input className="px-3 py-2 glass-panel border border-[rgba(255,255,255,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-accent-primary transition-shadow w-full" required type="text" value={newUser.first_name} onChange={e => setNewUser({...newUser, first_name: e.target.value})} />
                     </div>
                     <div className="form-group input-group">
-                      <label className="input-label">Last Name</label>
-                      <input className="input-field" required type="text" value={newUser.last_name} onChange={e => setNewUser({...newUser, last_name: e.target.value})} />
+                      <label className="text-sm font-medium text-gray-200">Last Name</label>
+                      <input className="px-3 py-2 glass-panel border border-[rgba(255,255,255,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-accent-primary transition-shadow w-full" required type="text" value={newUser.last_name} onChange={e => setNewUser({...newUser, last_name: e.target.value})} />
                     </div>
                     <div className="form-group input-group">
-                      <label className="input-label">Email</label>
-                      <input className="input-field" required type="email" value={newUser.email} onChange={e => setNewUser({...newUser, email: e.target.value})} />
+                      <label className="text-sm font-medium text-gray-200">Email</label>
+                      <input className="px-3 py-2 glass-panel border border-[rgba(255,255,255,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-accent-primary transition-shadow w-full" required type="email" value={newUser.email} onChange={e => setNewUser({...newUser, email: e.target.value})} />
                     </div>
                     <div className="form-group input-group">
-                      <label className="input-label">Phone</label>
-                      <input className="input-field" required type="text" value={newUser.phone} onChange={e => setNewUser({...newUser, phone: e.target.value})} />
+                      <label className="text-sm font-medium text-gray-200">Phone</label>
+                      <input className="px-3 py-2 glass-panel border border-[rgba(255,255,255,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-accent-primary transition-shadow w-full" required type="text" value={newUser.phone} onChange={e => setNewUser({...newUser, phone: e.target.value})} />
                     </div>
                     <div className="form-group input-group">
-                      <label className="input-label">Password</label>
-                      <input className="input-field" required type="password" value={newUser.password} onChange={e => setNewUser({...newUser, password: e.target.value})} />
+                      <label className="text-sm font-medium text-gray-200">Password</label>
+                      <input className="px-3 py-2 glass-panel border border-[rgba(255,255,255,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-accent-primary transition-shadow w-full" required type="password" value={newUser.password} onChange={e => setNewUser({...newUser, password: e.target.value})} />
                     </div>
                     <div className="form-group input-group">
-                      <label className="input-label">Role</label>
-                      <select className="input-field" required value={newUser.role_id} onChange={e => setNewUser({...newUser, role_id: e.target.value})}>
+                      <label className="text-sm font-medium text-gray-200">Role</label>
+                      <select className="px-3 py-2 glass-panel border border-[rgba(255,255,255,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-accent-primary transition-shadow w-full" required value={newUser.role_id} onChange={e => setNewUser({...newUser, role_id: e.target.value})}>
                         <option value="" disabled>Select a Role...</option>
                         {roles.map(r => (
                           <option key={r.id} value={r.id} className="select-option">{r.name}</option>
@@ -214,43 +214,43 @@ const Settings = () => {
                       </select>
                     </div>
                   </div>
-                  <div className="form-actions">
-                    <button type="submit" className="btn btn-primary">Save Member</button>
+                  <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-[rgba(255,255,255,0.08)]">
+                    <button type="submit" className="px-4 py-2 rounded-lg font-medium inline-flex items-center gap-2 bg-accent-primary text-white hover:bg-accent-primary/80 transition-colors shadow-sm">Save Member</button>
                   </div>
                 </form>
               </div>
             )}
 
             <div className="table-responsive">
-              <table className="data-table">
+              <table className="w-full text-left border-collapse">
                 <thead>
                   <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">Name</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">Email</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">Role</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {users.length === 0 ? (
                     <tr>
-                      <td colSpan="5" className="empty-state">No members found.</td>
+                      <td colSpan="5" className="p-12 text-center text-muted">No members found.</td>
                     </tr>
                   ) : (
                     users.map(user => (
                       <tr key={user.id}>
-                        <td>{user.first_name} {user.last_name}</td>
-                        <td>{user.email}</td>
-                        <td><span className="badge">{user.role?.name || 'No Role'}</span></td>
-                        <td>
+                        <td className="px-6 py-4 whitespace-nowrap">{user.first_name} {user.last_name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">{user.email}</td>
+                        <td className="px-6 py-4 whitespace-nowrap"><span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[rgba(255,255,255,0.05)] text-white">{user.role?.name || 'No Role'}</span></td>
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`status-badge ${user.is_active ? 'active' : 'inactive'}`}>
                             {user.is_active ? 'Active' : 'Inactive'}
                           </span>
                         </td>
                         <td className="actions-cell">
-                          <button className="icon-btn edit" onClick={() => setEditingUser(user)}><Edit size={16} /></button>
-                          <button className="icon-btn delete" onClick={() => handleDeleteUser(user.id)}><Trash2 size={16} /></button>
+                          <button className="p-1.5 text-muted hover:text-accent-primary hover:bg-[rgba(139,92,246,0.1)] rounded-lg transition-colors" onClick={() => setEditingUser(user)}><Edit size={16} /></button>
+                          <button className="p-1.5 text-muted hover:text-accent-danger hover:bg-red-50 rounded-lg transition-colors" onClick={() => handleDeleteUser(user.id)}><Trash2 size={16} /></button>
                         </td>
                       </tr>
                     ))
@@ -260,29 +260,29 @@ const Settings = () => {
             </div>
           </div>
         ) : (
-          <div className="glass" style={{ padding: '1.5rem' }}>
+          <div className="glass-panel rounded-xl shadow-sm border border-[rgba(255,255,255,0.08)] overflow-hidden" style={{ padding: '1.5rem' }}>
             <div className="card-header flex-between">
               <h2>Custom Roles</h2>
-              <button className="btn btn-primary" onClick={() => setShowRoleForm(!showRoleForm)}>
+              <button className="px-4 py-2 rounded-lg font-medium inline-flex items-center gap-2 bg-accent-primary text-white hover:bg-accent-primary/80 transition-colors shadow-sm" onClick={() => setShowRoleForm(!showRoleForm)}>
                 <Plus size={16} /> {showRoleForm ? 'Cancel' : 'Create Role'}
               </button>
             </div>
 
             {showRoleForm && (
-              <div className="form-container">
+              <div className="bg-[rgba(255,255,255,0.02)] p-6 rounded-xl border border-[rgba(255,255,255,0.08)] mb-6">
                 <form onSubmit={handleCreateRole} className="inline-form">
-                  <div className="form-grid">
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="form-group input-group">
-                      <label className="input-label">Role Name</label>
-                      <input className="input-field" required type="text" value={newRole.name} onChange={e => setNewRole({...newRole, name: e.target.value})} placeholder="e.g., Viewer" />
+                      <label className="text-sm font-medium text-gray-200">Role Name</label>
+                      <input className="px-3 py-2 glass-panel border border-[rgba(255,255,255,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-accent-primary transition-shadow w-full" required type="text" value={newRole.name} onChange={e => setNewRole({...newRole, name: e.target.value})} placeholder="e.g., Viewer" />
                     </div>
                     <div className="form-group input-group">
-                      <label className="input-label">Description</label>
-                      <input className="input-field" type="text" value={newRole.description} onChange={e => setNewRole({...newRole, description: e.target.value})} placeholder="Describe what this role can do..." />
+                      <label className="text-sm font-medium text-gray-200">Description</label>
+                      <input className="px-3 py-2 glass-panel border border-[rgba(255,255,255,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-accent-primary transition-shadow w-full" type="text" value={newRole.description} onChange={e => setNewRole({...newRole, description: e.target.value})} placeholder="Describe what this role can do..." />
                     </div>
                   </div>
                   <div className="form-group input-group" style={{ marginTop: '1rem' }}>
-                    <label className="input-label">Permissions</label>
+                    <label className="text-sm font-medium text-gray-200">Permissions</label>
                     <div className="permissions-grid">
                       {availablePermissions.map(perm => (
                         <label key={perm} className="checkbox-label">
@@ -296,43 +296,43 @@ const Settings = () => {
                       ))}
                     </div>
                   </div>
-                  <div className="form-actions">
-                    <button type="submit" className="btn btn-primary">Save Role</button>
+                  <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-[rgba(255,255,255,0.08)]">
+                    <button type="submit" className="px-4 py-2 rounded-lg font-medium inline-flex items-center gap-2 bg-accent-primary text-white hover:bg-accent-primary/80 transition-colors shadow-sm">Save Role</button>
                   </div>
                 </form>
               </div>
             )}
 
             <div className="table-responsive">
-              <table className="data-table">
+              <table className="w-full text-left border-collapse">
                 <thead>
                   <tr>
-                    <th>Role Name</th>
-                    <th>Description</th>
-                    <th>Permissions</th>
-                    <th>Actions</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">Role Name</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">Description</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">Permissions</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {roles.length === 0 ? (
                     <tr>
-                      <td colSpan="4" className="empty-state">No roles found.</td>
+                      <td colSpan="4" className="p-12 text-center text-muted">No roles found.</td>
                     </tr>
                   ) : (
                     roles.map(role => (
                       <tr key={role.id}>
-                        <td><strong>{role.name}</strong></td>
-                        <td>{role.description}</td>
-                        <td>
-                          <div className="tags-container">
+                        <td className="px-6 py-4 whitespace-nowrap"><strong>{role.name}</strong></td>
+                        <td className="px-6 py-4 whitespace-nowrap">{role.description}</td>
+                        <td className="px-6 py-4 min-w-[350px]">
+                          <div className="flex flex-wrap gap-2">
                             {role.permissions.map((p, i) => (
-                              <span key={i} className="tag">{p}</span>
+                              <span key={i} className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-[rgba(255,255,255,0.05)] text-gray-200 border border-[rgba(255,255,255,0.1)]">{p}</span>
                             ))}
                           </div>
                         </td>
                         <td className="actions-cell">
-                          <button className="icon-btn edit" onClick={() => setEditingRole(role)}><Edit size={16} /></button>
-                          <button className="icon-btn delete" onClick={() => handleDeleteRole(role.id)}><Trash2 size={16} /></button>
+                          <button className="p-1.5 text-muted hover:text-accent-primary hover:bg-[rgba(139,92,246,0.1)] rounded-lg transition-colors" onClick={() => setEditingRole(role)}><Edit size={16} /></button>
+                          <button className="p-1.5 text-muted hover:text-accent-danger hover:bg-red-50 rounded-lg transition-colors" onClick={() => handleDeleteRole(role.id)}><Trash2 size={16} /></button>
                         </td>
                       </tr>
                     ))
@@ -348,42 +348,42 @@ const Settings = () => {
       <Modal isOpen={!!editingUser} onClose={() => setEditingUser(null)} title="Edit Member">
         {editingUser && (
           <form onSubmit={handleUpdateUser} className="inline-form" style={{ padding: '1rem' }}>
-            <div className="form-grid">
+            <div className="grid grid-cols-2 gap-4">
               <div className="form-group input-group">
-                <label className="input-label">First Name</label>
-                <input className="input-field" required type="text" value={editingUser.first_name} onChange={e => setEditingUser({...editingUser, first_name: e.target.value})} />
+                <label className="text-sm font-medium text-gray-200">First Name</label>
+                <input className="px-3 py-2 glass-panel border border-[rgba(255,255,255,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-accent-primary transition-shadow w-full" required type="text" value={editingUser.first_name} onChange={e => setEditingUser({...editingUser, first_name: e.target.value})} />
               </div>
               <div className="form-group input-group">
-                <label className="input-label">Last Name</label>
-                <input className="input-field" required type="text" value={editingUser.last_name} onChange={e => setEditingUser({...editingUser, last_name: e.target.value})} />
+                <label className="text-sm font-medium text-gray-200">Last Name</label>
+                <input className="px-3 py-2 glass-panel border border-[rgba(255,255,255,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-accent-primary transition-shadow w-full" required type="text" value={editingUser.last_name} onChange={e => setEditingUser({...editingUser, last_name: e.target.value})} />
               </div>
               <div className="form-group input-group">
-                <label className="input-label">Email</label>
-                <input className="input-field" required type="email" value={editingUser.email} onChange={e => setEditingUser({...editingUser, email: e.target.value})} />
+                <label className="text-sm font-medium text-gray-200">Email</label>
+                <input className="px-3 py-2 glass-panel border border-[rgba(255,255,255,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-accent-primary transition-shadow w-full" required type="email" value={editingUser.email} onChange={e => setEditingUser({...editingUser, email: e.target.value})} />
               </div>
               <div className="form-group input-group">
-                <label className="input-label">Phone</label>
-                <input className="input-field" required type="text" value={editingUser.phone} onChange={e => setEditingUser({...editingUser, phone: e.target.value})} />
+                <label className="text-sm font-medium text-gray-200">Phone</label>
+                <input className="px-3 py-2 glass-panel border border-[rgba(255,255,255,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-accent-primary transition-shadow w-full" required type="text" value={editingUser.phone} onChange={e => setEditingUser({...editingUser, phone: e.target.value})} />
               </div>
               <div className="form-group input-group">
-                <label className="input-label">Status</label>
-                <select className="input-field" value={editingUser.is_active} onChange={e => setEditingUser({...editingUser, is_active: e.target.value === 'true'})}>
+                <label className="text-sm font-medium text-gray-200">Status</label>
+                <select className="px-3 py-2 glass-panel border border-[rgba(255,255,255,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-accent-primary transition-shadow w-full" value={editingUser.is_active} onChange={e => setEditingUser({...editingUser, is_active: e.target.value === 'true'})}>
                   <option value="true">Active</option>
                   <option value="false">Inactive</option>
                 </select>
               </div>
               <div className="form-group input-group">
-                <label className="input-label">Role</label>
-                <select className="input-field" value={editingUser.role_id} onChange={e => setEditingUser({...editingUser, role_id: e.target.value})}>
+                <label className="text-sm font-medium text-gray-200">Role</label>
+                <select className="px-3 py-2 glass-panel border border-[rgba(255,255,255,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-accent-primary transition-shadow w-full" value={editingUser.role_id} onChange={e => setEditingUser({...editingUser, role_id: e.target.value})}>
                   {roles.map(r => (
                     <option key={r.id} value={r.id} className="select-option">{r.name}</option>
                   ))}
                 </select>
               </div>
             </div>
-            <div className="form-actions" style={{ marginTop: '1.5rem' }}>
-              <button type="button" className="btn" onClick={() => setEditingUser(null)}>Cancel</button>
-              <button type="submit" className="btn btn-primary">Save Changes</button>
+            <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-[rgba(255,255,255,0.08)]" style={{ marginTop: '1.5rem' }}>
+              <button type="button" className="px-4 py-2 text-sm font-medium text-gray-200 glass-panel border border-[rgba(255,255,255,0.15)] rounded-lg hover:bg-[rgba(255,255,255,0.02)] transition-colors" onClick={() => setEditingUser(null)}>Cancel</button>
+              <button type="submit" className="px-4 py-2 rounded-lg font-medium inline-flex items-center gap-2 bg-accent-primary text-white hover:bg-accent-primary/80 transition-colors shadow-sm">Save Changes</button>
             </div>
           </form>
         )}
@@ -393,34 +393,35 @@ const Settings = () => {
       <Modal isOpen={!!editingRole} onClose={() => setEditingRole(null)} title="Edit Role">
         {editingRole && (
           <form onSubmit={handleUpdateRole} className="inline-form" style={{ padding: '1rem' }}>
-            <div className="form-grid">
+            <div className="grid grid-cols-2 gap-4">
               <div className="form-group input-group">
-                <label className="input-label">Role Name</label>
-                <input className="input-field" required type="text" value={editingRole.name} onChange={e => setEditingRole({...editingRole, name: e.target.value})} />
+                <label className="text-sm font-medium text-gray-200">Role Name</label>
+                <input className="px-3 py-2 glass-panel border border-[rgba(255,255,255,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-accent-primary transition-shadow w-full" required type="text" value={editingRole.name} onChange={e => setEditingRole({...editingRole, name: e.target.value})} />
               </div>
               <div className="form-group input-group">
-                <label className="input-label">Description</label>
-                <input className="input-field" type="text" value={editingRole.description} onChange={e => setEditingRole({...editingRole, description: e.target.value})} />
+                <label className="text-sm font-medium text-gray-200">Description</label>
+                <input className="px-3 py-2 glass-panel border border-[rgba(255,255,255,0.15)] rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-accent-primary transition-shadow w-full" type="text" value={editingRole.description} onChange={e => setEditingRole({...editingRole, description: e.target.value})} />
               </div>
             </div>
             <div className="form-group input-group" style={{ marginTop: '1rem' }}>
-              <label className="input-label">Permissions</label>
-              <div className="permissions-grid">
+              <label className="text-sm font-medium text-gray-200">Permissions</label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3">
                 {availablePermissions.map(perm => (
-                  <label key={perm} className="checkbox-label">
+                  <label key={perm} className="flex items-center gap-3 p-3 rounded-xl border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.05)] hover:border-[rgba(255,255,255,0.1)] cursor-pointer transition-all">
                     <input 
                       type="checkbox" 
+                      className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-accent-primary focus:ring-accent-primary focus:ring-offset-gray-900"
                       checked={editingRole.permissions?.includes(perm)}
                       onChange={() => handlePermissionToggle(perm, true)}
                     />
-                    <span>{perm}</span>
+                    <span className="text-sm font-medium text-gray-300">{perm}</span>
                   </label>
                 ))}
               </div>
             </div>
-            <div className="form-actions" style={{ marginTop: '1.5rem' }}>
-              <button type="button" className="btn" onClick={() => setEditingRole(null)}>Cancel</button>
-              <button type="submit" className="btn btn-primary">Update Role</button>
+            <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-[rgba(255,255,255,0.08)]" style={{ marginTop: '1.5rem' }}>
+              <button type="button" className="px-4 py-2 text-sm font-medium text-gray-200 glass-panel border border-[rgba(255,255,255,0.15)] rounded-lg hover:bg-[rgba(255,255,255,0.02)] transition-colors" onClick={() => setEditingRole(null)}>Cancel</button>
+              <button type="submit" className="px-4 py-2 rounded-lg font-medium inline-flex items-center gap-2 bg-accent-primary text-white hover:bg-accent-primary/80 transition-colors shadow-sm">Update Role</button>
             </div>
           </form>
         )}

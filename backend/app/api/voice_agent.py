@@ -30,6 +30,9 @@ from app.database.session import (
 from app.services.voice_agent_service import (
     process_voice_conversation,
 )
+from app.crud.voice_agent import voice_agent as crud_voice_agent
+from app.schemas.voice_agent import VoiceAgentResponse, VoiceAgentCreate, VoiceAgentUpdate
+from typing import List
 
 
 
@@ -59,14 +62,28 @@ class VoiceAgentRequest(BaseModel):
 
 
 
-# ==================================================
-# GET ALL AGENTS (MOCK)
-# ==================================================
+@router.get("", response_model=List[VoiceAgentResponse])
+def get_voice_agents(db: Session = Depends(get_db)):
+    return crud_voice_agent.get_all(db)
 
-@router.get("")
-def get_voice_agents():
-    # Return empty list or mock data to satisfy frontend
-    return []
+@router.post("", response_model=VoiceAgentResponse)
+def create_voice_agent(agent_in: VoiceAgentCreate, db: Session = Depends(get_db)):
+    return crud_voice_agent.create(db, obj_in=agent_in)
+
+@router.put("/{agent_id}", response_model=VoiceAgentResponse)
+def update_voice_agent(agent_id: UUID, agent_in: VoiceAgentUpdate, db: Session = Depends(get_db)):
+    agent = crud_voice_agent.get(db, agent_id=agent_id)
+    if not agent:
+        return {"error": "Voice agent not found"}
+    return crud_voice_agent.update(db, db_obj=agent, obj_in=agent_in)
+
+@router.delete("/{agent_id}")
+def delete_voice_agent(agent_id: UUID, db: Session = Depends(get_db)):
+    agent = crud_voice_agent.get(db, agent_id=agent_id)
+    if not agent:
+        return {"error": "Voice agent not found"}
+    crud_voice_agent.delete(db, agent_id=agent_id)
+    return {"status": "deleted"}
 
 # ==================================================
 # PROCESS COMPLETE AI CALL

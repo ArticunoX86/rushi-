@@ -3,7 +3,7 @@ from sqlalchemy import ForeignKey
 
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, (
+from sqlalchemy import (
     String,
     DateTime,
     Enum,

@@ -14,15 +14,11 @@ class AppConfig {
   static const String _localHost = "192.168.1.9";
   static const int _localPort = 8000;
 
-  // AWS CONFIG (Raw IP since no Domain is used)
-  // Replace this with your actual AWS Public IPv4 Address after launching EC2
-  static const String _awsHost = "43.205.19.246";
-  static const int _awsPort = 8000;
+  // AWS CONFIG (With SSL Domain and Nginx Proxy)
+  static const String _awsHost = "43.205.19.246.nip.io";
 
   static String get backendHost => isProduction ? _awsHost : _localHost;
-  static int get backendPort => isProduction ? _awsPort : _localPort;
 
-  // Since we are using Raw IP (No SSL Domain), we use http:// and ws://
-  static String get baseUrl => "http://$backendHost:$backendPort";
-  static String get websocketUrl => "ws://$backendHost:$backendPort";
+  static String get baseUrl => isProduction ? "https://$_awsHost/api" : "http://$_localHost:8000";
+  static String get websocketUrl => isProduction ? "wss://$_awsHost/api" : "ws://$_localHost:8000";
 }

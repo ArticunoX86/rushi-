@@ -8,6 +8,7 @@ from sqlalchemy import (
     ForeignKey,
     Text,
     Enum,
+    Column,
 )
 
 from sqlalchemy.dialects.postgresql import UUID
@@ -98,6 +99,8 @@ class Call(Base, TimestampMixin):
         Enum(CallOutcome),
         nullable=True,
     )
+
+    campaign_id = Column(UUID(as_uuid=True), ForeignKey("campaigns.id"), nullable=True)
 
 
     lead = relationship(

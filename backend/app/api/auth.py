@@ -11,9 +11,12 @@ from app.schemas.auth import (
     LoginResponse,
     RegisterRequest,
     MessageResponse,
+    ProfileUpdateRequest,
+    PasswordUpdateRequest
 )
 from app.schemas.user import UserResponse
 from app.services.auth_service import AuthService
+from app.core.security import verify_password, hash_password
 
 router = APIRouter(
     prefix="/auth",
@@ -41,7 +44,7 @@ def login(
     )
 
     try:
-        return AuthService.login(db, data)
+        return AuthService.login(db, data, form_data.client_id)
 
     except ValueError as e:
         raise HTTPException(
@@ -64,3 +67,36 @@ def get_current_logged_in_user(
     Return the currently authenticated user.
     """
     return current_user
+
+@router.put("/me", response_model=UserResponse)
+def update_current_user_profile(
+    update_data: ProfileUpdateRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    if update_data.first_name is not None:
+        current_user.first_name = update_data.first_name
+    if update_data.last_name is not None:
+        current_user.last_name = update_data.last_name
+    if update_data.phone is not None:
+        current_user.phone = update_data.phone
+        
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+
+@router.put("/me/password", response_model=MessageResponse)
+def update_current_user_password(
+    update_data: PasswordUpdateRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    if not verify_password(update_data.current_password, current_user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Incorrect current password"
+        )
+        
+    current_user.password_hash = hash_password(update_data.new_password)
+    db.commit()
+    return {"message": "Password updated successfully"}

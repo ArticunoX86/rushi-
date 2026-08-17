@@ -36,17 +36,59 @@ def process_conversation_turn(
     customer_message: str,
     lead_info: dict,
     whisper_hint: str = None,
+    system_prompt: str = None,
+    training_context: list[dict] = None,
 ) -> dict:
+    """
+    Single-turn unified AI engine.
+
+    Parameters
+    ----------
+    history         : Recent conversation dialogue lines
+    customer_message: Latest customer utterance
+    lead_info       : CRM data for the lead (name, city, budget, etc.)
+    whisper_hint    : Optional supervisor instruction to inject
+    system_prompt   : Custom voice agent system prompt from DB
+    training_context: List of AITrainingData dicts injected from the knowledge base.
+                      Each dict should have keys: category, title, trigger_phrase,
+                      situation_context, ideal_response.
+    """
+    
+    default_prompt_text = """You are a highly persuasive and friendly human sales representative for a real estate agency.
+Your task is to analyze the customer's message to extract their CRM requirements AND generate your conversational reply."""
+    
+    base_instructions = system_prompt if system_prompt else default_prompt_text
+
+    # ==================================================
+    # Build Training Knowledge Base Section
+    # ==================================================
+    training_section = ""
+    if training_context:
+        lines = []
+        for entry in training_context:
+            cat = entry.get("category", "").replace("_", " ").title()
+            title = entry.get("title", "")
+            trigger = entry.get("trigger_phrase", "")
+            response = entry.get("ideal_response", "")
+            situation = entry.get("situation_context", "")
+
+            if trigger:
+                lines.append(f"[{cat}] WHEN: \"{trigger}\" — DO: {response}")
+            else:
+                lines.append(f"[{cat}] {title}: {response}")
+
+        if lines:
+            training_section = "\n### AI Knowledge Base (MUST follow these scripts):\n" + "\n".join(lines) + "\n"
+
     prompt = f"""
-You are a highly persuasive and friendly human sales representative for a real estate agency.
-Your task is to analyze the customer's message to extract their CRM requirements AND generate your conversational reply.
+{base_instructions}
 
 ### Sales Playbook & Objection Handling:
 1. **Be Persuasive but Natural:** Act like a friendly human, not a pushy robot. Never use words like "leads", "CRM", or "AI".
 2. **Handle Objections:** If the customer says "not now" or tries to brush you off, DO NOT immediately give up. Acknowledge their time and offer a low-friction alternative (e.g., "I know you're busy! How about I send a quick WhatsApp with photos for later?").
 3. **Pitching:** Pitch the Available Properties listed below naturally.
 4. **Length:** Keep your conversational reply extremely concise and punchy (1-2 short sentences maximum).
-
+{training_section}
 Customer Lead Info:
 - Name: {lead_info.get("first_name", "there")}
 - Target City: {lead_info.get("preferred_city", "Flexible")}

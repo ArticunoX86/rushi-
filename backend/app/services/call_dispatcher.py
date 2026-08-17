@@ -77,20 +77,30 @@ async def start_ai_call(
     db.refresh(call)
 
     # ==================================================
-    # SEND COMMAND TO TATA SMARTFLO
+    # FORWARD CALL TO FLUTTER APPLICATION
     # ==================================================
 
-    tata_response = tata_telephony_service.make_outbound_call(
-        phone_number=lead.phone,
-        call_id=str(call.id)
-    )
+    from app.services.device_connection_manager import device_manager
+    import asyncio
+
+    asyncio.create_task(device_manager.broadcast_all({
+        "action": "CALL_ASSIGNED",
+        "payload": {
+            "call_id": str(call.id),
+            "customer_name": f"{lead.first_name} {lead.last_name or ''}".strip(),
+            "phone_number": lead.phone,
+            "status": call.status,
+            "priority": lead.priority,
+            "script_name": "AI Qualification",
+            "created_at": call.created_at.isoformat()
+        }
+    }))
 
     # ==================================================
     # RETURN RESULT
     # ==================================================
 
     return {
-        "message": "Call initiated via TATA Smartflo",
-        "tata_call_id": tata_response["tata_call_id"],
+        "message": "Call forwarded to mobile application for dispatch",
         "call_id": call.id,
     }

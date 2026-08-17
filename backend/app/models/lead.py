@@ -11,6 +11,7 @@ from sqlalchemy import (
     Enum,
     ForeignKey,
     Numeric,
+    Column,
 )
 
 from sqlalchemy.dialects.postgresql import UUID
@@ -179,6 +180,10 @@ class Lead(Base, TimestampMixin):
     # ==================================================
     # AI Call Relationship
     # ==================================================
+
+    notes = Column(Text, nullable=True)
+
+    campaign_id = Column(UUID(as_uuid=True), ForeignKey("campaigns.id"), nullable=True)
 
     calls = relationship(
         "Call",
