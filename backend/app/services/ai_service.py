@@ -37,12 +37,33 @@ from app.integrations.gemini.client import (
 )
 from app.crud.conversation import get_conversations_by_call
 
+# ==================================================
+# GUARDRAIL IMPORTS
+# ==================================================
+from app.guardrails.input_validator import validate_input
+from app.guardrails.output_validator import validate_output
+from app.guardrails.call_state_machine import get_or_create_state_machine
+from app.guardrails.sentiment_analyzer import analyze_sentiment
+from app.core.config import settings
+
+
 # Global in-memory dictionary for active supervisor whispers
 active_whispers = {}
 
 
 # ==================================================
-# AI CHAT ENGINE WITH GEMINI MEMORY
+# SAFE DEFLECTION RESPONSES
+# ==================================================
+INPUT_BLOCKED_RESPONSES = {
+    "prompt_injection": "I appreciate the creative question! But let's get back to finding you the perfect property. What's your preferred location?",
+    "toxic_content": "I understand you might be frustrated. I'm here to help — would you like to continue, or shall I have someone call you back at a better time?",
+    "excessive_length": "I got a lot of that! Could you give me the short version — what's the most important thing you're looking for in a property?",
+    "default": "I didn't quite catch that. Could you tell me a bit about what kind of property you're looking for?",
+}
+
+
+# ==================================================
+# AI CHAT ENGINE WITH GEMINI MEMORY + GUARDRAILS
 # ==================================================
 
 def process_customer_message(
@@ -86,6 +107,70 @@ def process_customer_message(
         db.commit()
         db.refresh(db_call)
 
+
+    # ==================================================
+    # GUARDRAIL 1: INPUT VALIDATION
+    # ==================================================
+    input_result = validate_input(request.message)
+    
+    if not input_result.is_safe:
+        print(f"[GUARDRAIL] Input blocked: {input_result.reason}")
+        
+        # Log the violation as a supervisor alert
+        try:
+            from app.api.supervisor_alerts import add_alert
+            add_alert(
+                call_id=str(request.call_id),
+                alert_type=input_result.violation_type,
+                message=f"Input blocked: {input_result.reason}",
+                severity="WARNING" if input_result.violation_type != "prompt_injection" else "CRITICAL",
+            )
+        except Exception as e:
+            print(f"[GUARDRAIL] Failed to create alert: {e}")
+        
+        # Return a safe deflection instead of calling Gemini
+        safe_reply = INPUT_BLOCKED_RESPONSES.get(
+            input_result.violation_type,
+            INPUT_BLOCKED_RESPONSES["default"],
+        )
+        
+        # Still save both messages for audit trail
+        save_message(db, ConversationCreate(
+            call_id=request.call_id,
+            sender=MessageSender.CUSTOMER,
+            message=request.message,
+        ))
+        save_message(db, ConversationCreate(
+            call_id=request.call_id,
+            sender=MessageSender.AI,
+            message=safe_reply,
+        ))
+        
+        return AIChatResponse(reply=safe_reply)
+
+
+    # ==================================================
+    # GUARDRAIL 2: SENTIMENT ANALYSIS
+    # ==================================================
+    sentiment_result = analyze_sentiment(
+        customer_message=request.message,
+        call_id=str(request.call_id),
+    )
+    
+    if sentiment_result.should_alert:
+        print(f"[GUARDRAIL] Sentiment alert: {sentiment_result.label} (score: {sentiment_result.score})")
+        try:
+            from app.api.supervisor_alerts import add_alert
+            add_alert(
+                call_id=str(request.call_id),
+                alert_type="sentiment_drop",
+                message=f"Customer sentiment is {sentiment_result.label} (score: {sentiment_result.score}). Trigger: '{sentiment_result.trigger_phrase}'",
+                severity="CRITICAL" if sentiment_result.label == "ANGRY" else "WARNING",
+            )
+        except Exception as e:
+            print(f"[GUARDRAIL] Failed to create sentiment alert: {e}")
+
+
     # ==================================================
     # Save Customer Message
     # ==================================================
@@ -102,6 +187,15 @@ def process_customer_message(
 
         ),
     )
+
+
+    # ==================================================
+    # GUARDRAIL 3: STATE MACHINE — Get phase-specific prompt
+    # ==================================================
+    state_prompt = ""
+    if settings.AI_ENABLE_STATE_MACHINE:
+        state_machine = get_or_create_state_machine(str(request.call_id))
+        state_prompt = state_machine.get_state_prompt()
 
 
     # ==================================================
@@ -207,6 +301,7 @@ def process_customer_message(
         whisper_hint=whisper_hint,
         system_prompt=agent_prompt,
         training_context=training_context,
+        state_prompt=state_prompt,
     )
     
     # Track usage of injected training entries
@@ -218,6 +313,38 @@ def process_customer_message(
     
     extracted = ai_result.get("crm_update", {})
     reply = ai_result.get("conversational_reply", "I understand. Give me a moment to check.")
+
+
+    # ==================================================
+    # GUARDRAIL 4: OUTPUT VALIDATION
+    # ==================================================
+    output_result = validate_output(reply)
+    
+    if not output_result.is_safe:
+        print(f"[GUARDRAIL] Output blocked: {output_result.reason}")
+        reply = output_result.safe_text
+        
+        try:
+            from app.api.supervisor_alerts import add_alert
+            add_alert(
+                call_id=str(request.call_id),
+                alert_type=output_result.violation_type,
+                message=f"Output modified: {output_result.reason}. Original: '{output_result.original_text[:100]}...'",
+                severity="WARNING",
+            )
+        except Exception as e:
+            print(f"[GUARDRAIL] Failed to create output alert: {e}")
+
+
+    # ==================================================
+    # GUARDRAIL 5: STATE MACHINE TRANSITION
+    # ==================================================
+    if settings.AI_ENABLE_STATE_MACHINE:
+        detected_intent = extracted.get("intent", "UNKNOWN")
+        state_machine = get_or_create_state_machine(str(request.call_id))
+        new_state = state_machine.transition(detected_intent)
+        print(f"[STATE MACHINE] Call {request.call_id}: {state_machine.state_history[-2].value if len(state_machine.state_history) > 1 else 'START'} → {new_state.value}")
+
 
     # ==================================================
     # Update Lead CRM Automatically
@@ -287,7 +414,8 @@ def process_customer_message(
             "payload": {
                 "call_id": str(request.call_id),
                 "customer_message": request.message,
-                "ai_message": reply
+                "ai_message": reply,
+                "sentiment": sentiment_result.label if sentiment_result else "NEUTRAL",
             }
         }))
     except Exception as e:

@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexaVoice — Remaining Work Report</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        :root {
+            --primary: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #8b5cf6;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.7;
+            padding: 40px;
+        }
+
+        @media print {
+            body { background: white; color: #1a1a1a; padding: 20px; }
+            .card { background: #f8f9fa !important; border: 1px solid #dee2e6 !important; }
+            .header { background: linear-gradient(135deg, #7c2d12, #dc2626) !important; }
+            h2, h3 { color: #1e293b !important; }
+            .priority-high, .priority-medium, .priority-low { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+        }
+
+        .container { max-width: 1000px; margin: 0 auto; }
+
+        .header {
+            background: linear-gradient(135deg, #0f172a, #7c2d12, #dc2626);
+            border-radius: 16px;
+            padding: 50px 40px;
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(239, 68, 68, 0.15) 0%, transparent 60%);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 300;
+            position: relative;
+        }
+
+        .header .date {
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            position: relative;
+        }
+
+        /* Summary Grid */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+
+        .summary-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .summary-item .number {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        .summary-item .label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .number-high { color: var(--danger); }
+        .number-medium { color: var(--warning); }
+        .number-low { color: var(--info); }
+
+        /* Overall Progress */
+        .overall-progress {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .progress-percentage {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--success), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .progress-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .progress-bar-full {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 16px;
+        }
+
+        .progress-bar-full .fill {
+            height: 100%;
+            border-radius: 6px;
+            background: linear-gradient(90deg, var(--success), var(--primary));
+            transition: width 0.5s ease;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 30px;
+            margin-bottom: 24px;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--danger);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            margin-top: 20px;
+            color: var(--text-primary);
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .priority-high { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .priority-medium { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+        .priority-low { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.88rem;
+        }
+
+        th {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        td { color: var(--text-secondary); }
+
+        .task-title { color: var(--text-primary); font-weight: 500; }
+
+        ul { list-style: none; padding: 0; }
+
+        ul li {
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+            color: var(--text-secondary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        ul li:last-child { border-bottom: none; }
+
+        ul li::before {
+            content: '⬜';
+            position: absolute;
+            left: 0;
+            font-size: 0.75rem;
+        }
+
+        .alert {
+            padding: 16px 20px;
+            border-radius: 10px;
+            margin: 16px 0;
+            font-size: 0.88rem;
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 3px solid var(--warning);
+            color: #fbbf24;
+        }
+
+        .alert-info {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 3px solid var(--primary);
+            color: #93c5fd;
+        }
+
+        .timeline-estimate {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .timeline-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .timeline-item .days {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--warning);
+        }
+
+        .timeline-item .scope {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+            margin: 40px 0;
+        }
+
+        .footer {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-top: 40px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>⏳ NexaVoice — Remaining Work</h1>
+            <p class="subtitle">Pending Features, Gaps & Recommended Improvements</p>
+            <p class="date">Report Generated: August 27, 2026 | Version: 1.0</p>
+        </div>
+
+        <!-- OVERALL PROGRESS -->
+        <div class="overall-progress">
+            <div class="progress-percentage">~78%</div>
+            <div class="progress-label">Overall Project Completion</div>
+            <div class="progress-bar-full">
+                <div class="fill" style="width: 78%;"></div>
+            </div>
+        </div>
+
+        <!-- SUMMARY -->
+        <div class="summary-grid">
+            <div class="summary-item">
+                <div class="number number-high">6</div>
+                <div class="label">🔴 High Priority</div>
+            </div>
+            <div class="summary-item">
+                <div class="number number-medium">7</div>
+                <div class="label">🟡 Medium Priority</div>
+            </div>
+            <div class="summary-item">
+                <div class="number number-low">6</div>
+                <div class="label">🟣 Low Priority</div>
+            </div>
+        </div>
+
+        <!-- ======== HIGH PRIORITY ======== -->
+        <div class="card">
+            <h2>🔴 1. High Priority — Critical Gaps</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 16px;">These items are either empty files in the codebase or features that are essential for production deployment.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Task</th>
+                        <th>Current State</th>
+                        <th>Details</th>
+                        <th>Priority</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="task-title">Appointment Booking Service</td>
+                        <td>Empty file (0 bytes)</td>
+                        <td>
+                            <code>appointment_service.py</code> and <code>appointments.py</code> are both empty placeholder files.
+                            This is a core feature described in the workflow — AI should book property site visits during calls.
+                        </td>
+                        <td><span class="priority-badge priority-high">High</span></td>
+                    </tr>
+                    <tr>
+                        <td class="task-title">WebSocket Module</td>
+                        <td>Empty file (0 bytes)</td>
+                        <td>
+                            <code>api/websocket.py</code> is empty. The WebSocket directory is also empty.
+                            General WebSocket communication beyond device sockets is not implemented.
+                        </td>
+                        <td><span class="priority-badge priority-high">High</span></td>
+                    </tr>
+                    <tr>
+                        <td class="task-title">Health Check API</td>
+                        <td>Empty file (0 bytes)</td>
+                        <td>
+                            <code>api/health.py</code> is empty. Health check exists in <code>main.py</code> directly, but the dedicated module is a stub.
+                        </td>
+                        <td><span class="priority-badge priority-high">High</span></td>
+                    </tr>
+                    <tr>
+                        <td class="task-title">Middleware Module</td>
+                        <td>Empty directory</td>
+                        <td>
+                            <code>app/middleware/</code> directory exists but is empty.
+                            No request logging, rate limiting, or tenant-scoping middleware implemented.
+                        </td>
+                        <td><span class="priority-badge priority-high">High</span></td>
+                    </tr>
+                    <tr>
+                        <td class="task-title">Background Scheduler / Cron</td>
+                        <td>Not implemented</td>
+                        <td>
+                            Per the workflow doc, a "cron-based background service" should automatically re-dispatch follow-up calls.
+                            No scheduler (APScheduler / Celery) is present in the codebase.
+                        </td>
+                        <td><span class="priority-badge priority-high">High</span></td>
+                    </tr>
+                    <tr>
+                        <td class="task-title">README Documentation</td>
+                        <td>Empty file (0 bytes)</td>
+                        <td>
+                            <code>README.md</code> at repository root is completely empty.
+                            No project description, setup instructions, or usage guide.
+                        </td>
+                        <td><span class="priority-badge priority-high">High</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ======== MEDIUM PRIORITY ======== -->
+        <div class="card">
+            <h2>🟡 2. Medium Priority — Improvements Needed</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Task</th>
+                        <th>Details</th>
+                        <th>Priority</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="task-title">Automated Test Suite (Backend)</td>
+                        <td>
+                            The <code>testing/</code> directory is empty. Existing test files (<code>test_*.py</code>) are ad-hoc scripts in the backend root, not a proper pytest test suite with fixtures.
+                            No CI/CD pipeline configured.
+                        </td>
+                        <td><span class="priority-badge priority-medium">Medium</span></td>
+                    </tr>
+                    <tr>
+                        <td class="task-title">Frontend Unit/E2E Tests</td>
+                        <td>
+                            No test files exist in the frontend. No Jest, Vitest, or Cypress configuration found.
+                        </td>
+                        <td><span class="priority-badge priority-medium">Medium</span></td>
+                    </tr>
+                    <tr>
+                        <td class="task-title">Flutter Widget/Integration Tests</td>
+                        <td>
+                            The <code>ai_voice_calling/test/</code> directory exists but needs proper test coverage for all 13 feature modules.
+                        </td>
+                        <td><span class="priority-badge priority-medium">Medium</span></td>
+                    </tr>
+                    <tr>
+                        <td class="task-title">Error Handling & Recovery</td>
+                        <td>
+                            No global error handling middleware. No structured error response format.
+                            No retry logic for failed AI API calls (Deepgram, Gemini, ElevenLabs).
+                        </td>
+                        <td><span class="priority-badge priority-medium">Medium</span></td>
+                    </tr>
+                    <tr>
+                        <td class="task-title">Production PostgreSQL Migration</td>
+                        <td>
+                            Development uses SQLite (<code>data.db</code>). Need to verify all 20 Alembic migrations run cleanly against production PostgreSQL with pgvector.
+                        </td>
+                        <td><span class="priority-badge priority-medium">Medium</span></td>
+                    </tr>
+                    <tr>
+                        <td class="task-title">Deployment Directory (Empty)</td>
+                        <td>
+                            <code>deployment/</code> directory exists but is empty. No deployment scripts, CI/CD configs, or runbooks present.
+                        </td>
+                        <td><span class="priority-badge priority-medium">Medium</span></td>
+                    </tr>
+                    <tr>
+                        <td class="task-title">.env & Secrets Management</td>
+                        <td>
+                            Backend <code>.env</code> file is tracked in git (3.2 KB). Secrets should be managed via environment variables or a vault, not committed to the repository.
+                        </td>
+                        <td><span class="priority-badge priority-medium">Medium</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ======== LOW PRIORITY ======== -->
+        <div class="card">
+            <h2>🟣 3. Low Priority — Polish & Enhancements</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Task</th>
+                        <th>Details</th>
+                        <th>Priority</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="task-title">API Rate Limiting</td>
+                        <td>No rate limiting configured on any API endpoint. Important for public-facing APIs to prevent abuse.</td>
+                        <td><span class="priority-badge priority-low">Low</span></td>
+                    </tr>
+                    <tr>
+                        <td class="task-title">API Versioning</td>
+                        <td>Some routes use <code>/api/v1/</code> prefix while others don't. Inconsistent API versioning strategy.</td>
+                        <td><span class="priority-badge priority-low">Low</span></td>
+                    </tr>
+                    <tr>
+                        <td class="task-title">Notification System</td>
+                        <td>No push notification or email notification system for call results, appointment confirmations, or lead updates.</td>
+                        <td><span class="priority-badge priority-low">Low</span></td>
+                    </tr>
+                    <tr>
+                        <td class="task-title">Call Recording Playback UI</td>
+                        <td>Audio recordings are stored on S3 but no in-app audio player exists on the frontend or mobile app to play them back.</td>
+                        <td><span class="priority-badge priority-low">Low</span></td>
+                    </tr>
+                    <tr>
+                        <td class="task-title">Logging & Monitoring</td>
+                        <td>Basic logger exists but no centralized logging (ELK/Datadog), APM, or alerting configured for production monitoring.</td>
+                        <td><span class="priority-badge priority-low">Low</span></td>
+                    </tr>
+                    <tr>
+                        <td class="task-title">iOS Build & Testing</td>
+                        <td>Flutter iOS directory exists but native iOS audio routing (equivalent to Android's <code>RealTimeAudioService.kt</code>) needs verification and testing on physical devices.</td>
+                        <td><span class="priority-badge priority-low">Low</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ======== MODULE-WISE PROGRESS ======== -->
+        <div class="card">
+            <h2>📊 4. Module-Wise Completion Progress</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Module</th>
+                        <th>Completion</th>
+                        <th>Progress</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="task-title">Backend — Core APIs</td>
+                        <td>95%</td>
+                        <td>
+                            <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                                <div style="width: 95%; height: 100%; background: linear-gradient(90deg, #10b981, #3b82f6); border-radius: 4px;"></div>
+                            </div>
+                        </td>
+                        <td>Only appointments API is empty</td>
+                    </tr>
+                    <tr>
+                        <td class="task-title">Backend — AI Engine</td>
+                        <td>90%</td>
+                        <td>
+                            <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                                <div style="width: 90%; height: 100%; background: linear-gradient(90deg, #10b981, #3b82f6); border-radius: 4px;"></div>
+                            </div>
+                        </td>
+                        <td>Retry logic & fallbacks needed</td>
+                    </tr>
+                    <tr>
+                        <td class="task-title">Backend — Salesforce CRM</td>
+                        <td>85%</td>
+                        <td>
+                            <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                                <div style="width: 85%; height: 100%; background: linear-gradient(90deg, #10b981, #3b82f6); border-radius: 4px;"></div>
+                            </div>
+                        </td>
+                        <td>Appointment sync to SF missing</td>
+                    </tr>
+                    <tr>
+                        <td class="task-title">Backend — DevOps</td>
+                        <td>70%</td>
+                        <td>
+                            <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                                <div style="width: 70%; height: 100%; background: linear-gradient(90deg, #f59e0b, #ef4444); border-radius: 4px;"></div>
+                            </div>
+                        </td>
+                        <td>No CI/CD, empty deployment dir</td>
+                    </tr>
+                    <tr>
+                        <td class="task-title">Frontend — Pages</td>
+                        <td>95%</td>
+                        <td>
+                            <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                                <div style="width: 95%; height: 100%; background: linear-gradient(90deg, #10b981, #3b82f6); border-radius: 4px;"></div>
+                            </div>
+                        </td>
+                        <td>All 15 pages built</td>
+                    </tr>
+                    <tr>
+                        <td class="task-title">Frontend — Testing</td>
+                        <td>0%</td>
+                        <td>
+                            <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                                <div style="width: 0%; height: 100%; background: linear-gradient(90deg, #ef4444, #ef4444); border-radius: 4px;"></div>
+                            </div>
+                        </td>
+                        <td>No test framework setup</td>
+                    </tr>
+                    <tr>
+                        <td class="task-title">Mobile App — Features</td>
+                        <td>85%</td>
+                        <td>
+                            <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                                <div style="width: 85%; height: 100%; background: linear-gradient(90deg, #10b981, #3b82f6); border-radius: 4px;"></div>
+                            </div>
+                        </td>
+                        <td>13 features done, iOS untested</td>
+                    </tr>
+                    <tr>
+                        <td class="task-title">Documentation</td>
+                        <td>50%</td>
+                        <td>
+                            <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                                <div style="width: 50%; height: 100%; background: linear-gradient(90deg, #f59e0b, #ef4444); border-radius: 4px;"></div>
+                            </div>
+                        </td>
+                        <td>README empty, no API docs</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ======== ESTIMATED EFFORT ======== -->
+        <div class="card">
+            <h2>⏱️ 5. Estimated Effort to Complete</h2>
+
+            <div class="alert alert-info">
+                <strong>💡 Note:</strong> These are rough estimates assuming a single full-stack developer working full-time. Actual timelines depend on team size, testing requirements, and scope decisions.
+            </div>
+
+            <div class="timeline-estimate">
+                <div class="timeline-item">
+                    <div class="days">3–5 days</div>
+                    <div class="scope">High Priority Items</div>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 8px;">Appointments, Scheduler, Middleware, WebSocket, README</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="days">5–8 days</div>
+                    <div class="scope">Medium Priority Items</div>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 8px;">Test suites, CI/CD, Error handling, DB migration verification</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="days">3–5 days</div>
+                    <div class="scope">Low Priority Items</div>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 8px;">Rate limiting, Notifications, Audio player, Monitoring</p>
+                </div>
+            </div>
+
+            <div class="alert alert-warning" style="margin-top: 24px;">
+                <strong>📅 Total Estimated Time to 100% Completion: 11–18 working days (2–3.5 weeks)</strong>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ======== RECOMMENDED PRIORITY ORDER ======== -->
+        <div class="card">
+            <h2>🎯 6. Recommended Execution Order</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 16px;">Suggested order of implementation to maximize impact with minimal effort:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Task</th>
+                        <th>Est. Time</th>
+                        <th>Impact</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td class="task-title">Write comprehensive README.md</td>
+                        <td>2–3 hours</td>
+                        <td>First impression for any reviewer</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td class="task-title">Implement Appointment Booking (API + Service)</td>
+                        <td>1–2 days</td>
+                        <td>Core missing feature</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td class="task-title">Add request logging & error handling middleware</td>
+                        <td>0.5 day</td>
+                        <td>Production readiness</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td class="task-title">Implement Background Scheduler for follow-ups</td>
+                        <td>1–2 days</td>
+                        <td>Key automation feature</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td class="task-title">Remove .env from git, add .env.example</td>
+                        <td>30 min</td>
+                        <td>Security critical</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td class="task-title">Set up pytest suite with core test cases</td>
+                        <td>2–3 days</td>
+                        <td>Code reliability</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td class="task-title">Add CI/CD pipeline (GitHub Actions)</td>
+                        <td>0.5–1 day</td>
+                        <td>Automated quality gates</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td class="task-title">Verify PostgreSQL migration on production</td>
+                        <td>0.5 day</td>
+                        <td>Data integrity</td>
+                    </tr>
+                    <tr>
+                        <td>9</td>
+                        <td class="task-title">Add rate limiting & API versioning consistency</td>
+                        <td>0.5 day</td>
+                        <td>API hardening</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td class="task-title">Frontend test setup (Vitest + basic tests)</td>
+                        <td>1–2 days</td>
+                        <td>Frontend reliability</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <p>NexaVoice — Salesforce AI Calling Agent Platform</p>
+            <p>© 2026 | Remaining Work Report | To save as PDF, press <strong>Ctrl+P</strong> and select "Save as PDF"</p>
+        </div>
+    </div>
+</body>
+</html>

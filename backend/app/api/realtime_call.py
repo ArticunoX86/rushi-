@@ -40,6 +40,21 @@ from app.schemas.conversation import (
     ConversationCreate,
 )
 
+# ==================================================
+# GUARDRAIL IMPORTS
+# ==================================================
+from app.guardrails.call_timeout_manager import (
+    register_call,
+    increment_turn,
+    is_call_expired,
+    get_timeout_message,
+    unregister_call,
+    force_end_call,
+)
+from app.guardrails.call_state_machine import remove_state_machine
+from app.guardrails.sentiment_analyzer import clear_call_sentiment
+
+
 router = APIRouter(
     prefix="/realtime",
     tags=[
@@ -61,6 +76,12 @@ async def realtime_call(
     await websocket.accept()
 
     print("\nAI SESSION CREATED:", call_id)
+
+    # ==================================================
+    # GUARDRAIL: Register call with timeout manager
+    # ==================================================
+    register_call(call_id)
+    print(f"[GUARDRAIL] Call {call_id} registered with timeout manager")
 
     loop = asyncio.get_running_loop()
     db = SessionLocal()
@@ -142,6 +163,38 @@ async def realtime_call(
 
                 if not is_final:
                     return
+
+                # ======================================
+                # GUARDRAIL: Check call timeout/turn limit
+                # ======================================
+                expired, reason = is_call_expired(call_id)
+                if expired:
+                    print(f"[GUARDRAIL] Call expired: {reason}")
+                    timeout_msg = get_timeout_message(call_id)
+                    
+                    # Send graceful goodbye
+                    await websocket.send_json({
+                        "type": "ai_reply",
+                        "text": timeout_msg,
+                    })
+                    audio = await loop.run_in_executor(None, generate_ai_voice, timeout_msg)
+                    if audio:
+                        await websocket.send_bytes(audio)
+                    
+                    # Log alert
+                    try:
+                        from app.api.supervisor_alerts import add_alert
+                        add_alert(call_id, "timeout", reason, "WARNING")
+                    except Exception:
+                        pass
+                    
+                    # Close the connection
+                    await asyncio.sleep(3)  # Let the goodbye play
+                    await websocket.close()
+                    return
+                
+                # Increment turn counter
+                increment_turn(call_id)
 
                 dialog_lines.append(f"Customer: {transcript}")
 
@@ -300,6 +353,15 @@ async def realtime_call(
         print("REALTIME CALL ERROR:", e)
     finally:
         print("CLEANING UP CALL...")
+
+        # ==================================================
+        # GUARDRAIL: Clean up all per-call state
+        # ==================================================
+        unregister_call(call_id)
+        remove_state_machine(call_id)
+        clear_call_sentiment(call_id)
+        print(f"[GUARDRAIL] Cleaned up guardrail state for call {call_id}")
+
         if orchestrator:
             try:
                 await orchestrator.close()

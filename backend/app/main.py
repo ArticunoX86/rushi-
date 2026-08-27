@@ -42,6 +42,7 @@ from app.api.roles import router as roles_router
 from app.api.super_admin import router as super_admin_router
 from app.api.campaigns import router as campaigns_router
 from app.api.ai_training import router as ai_training_router
+from app.api.supervisor_alerts import router as supervisor_alerts_router
 
 
 
@@ -330,3 +331,4 @@ app.include_router(roles_router)
 app.include_router(super_admin_router)
 app.include_router(campaigns_router)
 app.include_router(ai_training_router)
+app.include_router(supervisor_alerts_router)

@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexaVoice — Completed Work Report</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.7;
+            padding: 40px;
+        }
+
+        @media print {
+            body {
+                background: white;
+                color: #1a1a1a;
+                padding: 20px;
+            }
+            .card { background: #f8f9fa !important; border: 1px solid #dee2e6 !important; }
+            .header { background: linear-gradient(135deg, #1e3a5f, #2563eb) !important; }
+            h2, h3 { color: #1e293b !important; }
+            .badge { border: 1px solid #ccc !important; }
+            .progress-fill { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0f172a, #1e40af, #3b82f6);
+            border-radius: 16px;
+            padding: 50px 40px;
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 60%);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 300;
+            position: relative;
+        }
+
+        .header .date {
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            position: relative;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+
+        .summary-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .summary-item .number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .summary-item .label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 30px;
+            margin-bottom: 24px;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            margin-top: 20px;
+            color: var(--text-primary);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-done { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+        .badge-partial { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+        .badge-pending { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        ul li {
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+            color: var(--text-secondary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        ul li:last-child { border-bottom: none; }
+
+        ul li::before {
+            content: '✅';
+            position: absolute;
+            left: 0;
+            font-size: 0.85rem;
+        }
+
+        .file-ref {
+            font-family: 'Courier New', monospace;
+            font-size: 0.78rem;
+            color: var(--primary);
+            background: rgba(59, 130, 246, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+
+        th {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+        }
+
+        .tech-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 6px;
+            font-size: 0.78rem;
+            color: var(--primary);
+            margin: 3px 2px;
+        }
+
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+            margin: 40px 0;
+        }
+
+        .footer {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-top: 40px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>✅ NexaVoice — Completed Work</h1>
+            <p class="subtitle">Salesforce AI Calling Agent Platform — All Completed Modules & Features</p>
+            <p class="date">Report Generated: August 27, 2026 | Version: 1.1</p>
+        </div>
+
+        <!-- SUMMARY STATS -->
+        <div class="summary-grid">
+            <div class="summary-item">
+                <div class="number">28</div>
+                <div class="label">Backend APIs</div>
+            </div>
+            <div class="summary-item">
+                <div class="number">15</div>
+                <div class="label">Frontend Pages</div>
+            </div>
+            <div class="summary-item">
+                <div class="number">13</div>
+                <div class="label">Mobile Features</div>
+            </div>
+            <div class="summary-item">
+                <div class="number">20</div>
+                <div class="label">DB Migrations</div>
+            </div>
+        </div>
+
+        <!-- ======== BACKEND ======== -->
+        <div class="card">
+            <h2>🧠 1. Backend (Python / FastAPI)</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 16px;">The core backend server is fully operational with 28+ API routers, 20 services, 15 data models, and complete database migration history.</p>
+
+            <h3>1.1 Core Application Setup</h3>
+            <ul>
+                <li>FastAPI application with custom dark-themed Swagger UI <span class="file-ref">app/main.py</span></li>
+                <li>CORS middleware configured for cross-origin requests</li>
+                <li>Health check endpoint at <code>/health</code></li>
+                <li>Database connection verification on startup via lifespan</li>
+                <li>Uvicorn ASGI server configuration</li>
+                <li>Centralized environment settings & config <span class="file-ref">app/core/config.py</span></li>
+                <li>Custom logger setup <span class="file-ref">app/core/logger.py</span></li>
+                <li>JWT-based security & authentication utilities <span class="file-ref">app/core/security.py</span></li>
+                <li>Dependency injection system <span class="file-ref">app/core/dependencies.py</span></li>
+            </ul>
+
+            <h3>1.2 Authentication & User Management</h3>
+            <ul>
+                <li>User registration and login with JWT tokens <span class="file-ref">api/auth.py</span></li>
+                <li>OTP-based verification system (DB migration completed)</li>
+                <li>Role-Based Access Control (RBAC) with roles table <span class="file-ref">api/roles.py</span></li>
+                <li>Super Admin management panel <span class="file-ref">api/super_admin.py</span></li>
+                <li>User CRUD operations <span class="file-ref">api/users.py</span></li>
+                <li>Multi-tenancy support with tenant isolation <span class="file-ref">models/tenant.py</span></li>
+            </ul>
+
+            <h3>1.3 Real Estate Domain — Leads & Properties</h3>
+            <ul>
+                <li>Lead management API — create, read, update, filter leads <span class="file-ref">api/leads.py</span></li>
+                <li>Lead model with source, status, priority enums <span class="file-ref">models/lead.py</span></li>
+                <li>Property management API — CRUD for real estate listings <span class="file-ref">api/properties.py</span></li>
+                <li>Property model with detailed fields (price, area, amenities, geo) <span class="file-ref">models/property.py</span></li>
+                <li>Property recommendation engine <span class="file-ref">services/recommendation_service.py</span></li>
+                <li>Lead service layer <span class="file-ref">services/lead_service.py</span></li>
+                <li>Property service layer <span class="file-ref">services/property_service.py</span></li>
+            </ul>
+
+            <h3>1.4 AI Voice Calling Engine</h3>
+            <ul>
+                <li>AI service with Gemini LLM integration for conversation generation <span class="file-ref">services/ai_service.py</span></li>
+                <li>Gemini client wrapper <span class="file-ref">integrations/gemini/client.py</span></li>
+                <li>Deepgram STT integration <span class="file-ref">integrations/deepgram/</span></li>
+                <li>ElevenLabs TTS integration <span class="file-ref">integrations/elevenlabs/</span></li>
+                <li>Cartesia TTS integration (alternative) <span class="file-ref">integrations/cartesia/</span></li>
+                <li>OpenAI integration module <span class="file-ref">integrations/openai/</span></li>
+                <li>Speech service layer <span class="file-ref">services/speech_service.py</span></li>
+                <li>TTS service abstraction <span class="file-ref">services/tts_service.py</span></li>
+                <li>4 specialized AI prompt templates:
+                    <em>Lead Qualification, Property Recommendation, Objection Handling, Appointment Booking</em>
+                    <span class="file-ref">prompts/</span></li>
+                <li>Voice API endpoint <span class="file-ref">api/voice.py</span></li>
+                <li>Voice agent configuration & management <span class="file-ref">api/voice_agent.py</span></li>
+            </ul>
+
+            <h3>1.5 AI Safety Guardrails (Anti-Rogue Layer)</h3>
+            <ul>
+                <li>Input validation — blocks prompt injections & toxicity <span class="file-ref">guardrails/input_validator.py</span></li>
+                <li>Output validation — blocks banned phrases & long responses <span class="file-ref">guardrails/output_validator.py</span></li>
+                <li>Call state machine — enforces conversation phases <span class="file-ref">guardrails/call_state_machine.py</span></li>
+                <li>Sentiment analyzer — triggers supervisor alerts on anger <span class="file-ref">guardrails/sentiment_analyzer.py</span></li>
+                <li>Timeout manager — enforces max duration & turn limits <span class="file-ref">guardrails/call_timeout_manager.py</span></li>
+                <li>Supervisor alerts API — for human takeover & monitoring <span class="file-ref">api/supervisor_alerts.py</span></li>
+                <li>Safety tests suite (38 passing tests) <span class="file-ref">tests/test_guardrails.py</span></li>
+            </ul>
+
+            <h3>1.5 Real-Time Communication (WebRTC / LiveKit)</h3>
+            <ul>
+                <li>Real-time call handling via WebRTC signaling <span class="file-ref">api/realtime_call.py</span></li>
+                <li>LiveKit service for room token generation <span class="file-ref">services/livekit_service.py</span></li>
+                <li>WebRTC endpoint for room management <span class="file-ref">api/webrtc.py</span></li>
+                <li>WebRTC agent logic <span class="file-ref">services/webrtc_agent.py</span></li>
+                <li>Device socket WebSocket for real-time device communication <span class="file-ref">api/device_socket.py</span></li>
+            </ul>
+
+            <h3>1.6 Call Management & Analytics</h3>
+            <ul>
+                <li>Call CRUD API with full lifecycle tracking <span class="file-ref">api/calls.py</span></li>
+                <li>Call model with status, duration, transcript, outcome fields <span class="file-ref">models/call.py</span></li>
+                <li>Call service layer <span class="file-ref">services/call_service.py</span></li>
+                <li>Call dispatcher service for auto-dialing leads <span class="file-ref">services/call_dispatcher.py</span></li>
+                <li>Call orchestrator service <span class="file-ref">services/call_orchestrator.py</span></li>
+                <li>Call dispatch API endpoint <span class="file-ref">api/call_dispatch.py</span></li>
+                <li>Call analyzer service for AI-based post-call analytics <span class="file-ref">services/call_analyzer_service.py</span></li>
+                <li>Conversation CRUD API <span class="file-ref">api/conversations.py</span></li>
+                <li>Conversation model with transcript storage <span class="file-ref">models/conversation.py</span></li>
+                <li>Conversation service layer <span class="file-ref">services/conversation_service.py</span></li>
+            </ul>
+
+            <h3>1.7 Device Management</h3>
+            <ul>
+                <li>Device registration, status tracking API <span class="file-ref">api/devices.py</span></li>
+                <li>Device model (phone, status, connection) <span class="file-ref">models/device.py</span></li>
+                <li>Device service layer <span class="file-ref">services/device_service.py</span></li>
+                <li>Device connection manager (WebSocket-based) <span class="file-ref">services/device_connection_manager.py</span></li>
+            </ul>
+
+            <h3>1.8 Salesforce CRM Integration</h3>
+            <ul>
+                <li>Salesforce OAuth2 authentication <span class="file-ref">services/salesforce_service.py</span></li>
+                <li>Lead sync — fetch Salesforce leads into local DB</li>
+                <li>Push call logs / transcripts / outcomes back to Salesforce</li>
+                <li>Salesforce API endpoint <span class="file-ref">api/salesforce.py</span></li>
+                <li>Salesforce Knowledge Base integration <span class="file-ref">api/salesforce_knowledge.py</span></li>
+                <li>Knowledge model <span class="file-ref">models/knowledge.py</span></li>
+                <li>Mock/Developer sandbox fallback when credentials are unavailable</li>
+            </ul>
+
+            <h3>1.9 Dashboard & Analytics</h3>
+            <ul>
+                <li>Dashboard API with aggregated metrics <span class="file-ref">api/dashboard.py</span></li>
+                <li>Analytics API for charts and reports <span class="file-ref">api/analytics.py</span></li>
+                <li>Application logs API <span class="file-ref">api/logs.py</span></li>
+                <li>App log model <span class="file-ref">models/app_log.py</span></li>
+            </ul>
+
+            <h3>1.10 Campaigns & AI Training</h3>
+            <ul>
+                <li>Campaign management API <span class="file-ref">api/campaigns.py</span></li>
+                <li>Campaign model <span class="file-ref">models/campaign.py</span></li>
+                <li>AI Training data management API (scenarios, Q&A, scoring) <span class="file-ref">api/ai_training.py</span></li>
+                <li>AI Training data model <span class="file-ref">models/ai_training_data.py</span></li>
+            </ul>
+
+            <h3>1.11 Telephony Integration</h3>
+            <ul>
+                <li>Airtel SIP trunk API <span class="file-ref">api/airtel_sip.py</span></li>
+                <li>Tata Smartflo telephony webhooks <span class="file-ref">api/endpoints/tata_webhooks.py</span></li>
+                <li>Tata telephony service <span class="file-ref">services/tata_telephony_service.py</span></li>
+            </ul>
+
+            <h3>1.12 Database & Migrations</h3>
+            <ul>
+                <li>SQLAlchemy ORM with session management <span class="file-ref">database/session.py</span></li>
+                <li>Alembic configured with 20 migration scripts covering all tables</li>
+                <li>PostgreSQL with pgvector support (Docker) + SQLite for dev</li>
+                <li>15 data models fully defined with relationships and enums</li>
+                <li>12 Pydantic schema files for request/response validation</li>
+                <li>10 CRUD operation modules</li>
+            </ul>
+
+            <h3>1.13 Infrastructure & DevOps</h3>
+            <ul>
+                <li>Dockerfile for containerized deployment <span class="file-ref">Dockerfile</span></li>
+                <li>Docker Compose with 4 services: Backend, PostgreSQL, Nginx, Certbot <span class="file-ref">docker-compose.yml</span></li>
+                <li>Nginx reverse proxy configuration <span class="file-ref">nginx/</span></li>
+                <li>SSL/TLS via Let's Encrypt (Certbot)</li>
+                <li>Backend startup script <span class="file-ref">start_backend.sh</span></li>
+                <li>AWS S3 integration for audio storage <span class="file-ref">integrations/aws/</span></li>
+                <li>Multiple seed scripts for admin, agents, properties, playbooks, scenarios</li>
+            </ul>
+
+            <h3>1.14 Testing & Simulation</h3>
+            <ul>
+                <li>AI response tests (no DB required) <span class="file-ref">test_ai_responses_no_db.py</span></li>
+                <li>Scenario testing — multiple versions <span class="file-ref">test_scenarios.py, test_scenarios_v2.py, test_scenarios_fast.py</span></li>
+                <li>API endpoint tests <span class="file-ref">test_api.py</span></li>
+                <li>Gemini model tests <span class="file-ref">test_gemini.py</span></li>
+                <li>AI integration tests <span class="file-ref">test_ai.py</span></li>
+                <li>Full call simulation scripts <span class="file-ref">simulate_call.py, simulate_full_call.py</span></li>
+                <li>Realtime WebSocket call simulator <span class="file-ref">simulate_realtime_ws.py</span></li>
+                <li>Voice call simulator <span class="file-ref">simulate_voice_call.py</span></li>
+            </ul>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ======== FRONTEND ======== -->
+        <div class="card">
+            <h2>🖥️ 2. Frontend Web Dashboard (React / Vite)</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 16px;">A fully functional admin dashboard with 15 pages, Tailwind CSS styling, and JWT-based authentication context.</p>
+
+            <h3>2.1 Pages (15 Completed)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Page</th>
+                        <th>File</th>
+                        <th>Size</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Dashboard</td><td class="file-ref">Dashboard.jsx</td><td>10.5 KB</td><td><span class="badge badge-done">Complete</span></td></tr>
+                    <tr><td>Login</td><td class="file-ref">Login.jsx</td><td>6.7 KB</td><td><span class="badge badge-done">Complete</span></td></tr>
+                    <tr><td>Authentication</td><td class="file-ref">Auth.jsx</td><td>2.3 KB</td><td><span class="badge badge-done">Complete</span></td></tr>
+                    <tr><td>Leads Management</td><td class="file-ref">Leads.jsx</td><td>14.0 KB</td><td><span class="badge badge-done">Complete</span></td></tr>
+                    <tr><td>Properties</td><td class="file-ref">Properties.jsx</td><td>16.1 KB</td><td><span class="badge badge-done">Complete</span></td></tr>
+                    <tr><td>Calls</td><td class="file-ref">Calls.jsx</td><td>14.5 KB</td><td><span class="badge badge-done">Complete</span></td></tr>
+                    <tr><td>Voice Agents</td><td class="file-ref">VoiceAgents.jsx</td><td>12.8 KB</td><td><span class="badge badge-done">Complete</span></td></tr>
+                    <tr><td>Devices</td><td class="file-ref">Devices.jsx</td><td>7.7 KB</td><td><span class="badge badge-done">Complete</span></td></tr>
+                    <tr><td>Campaigns</td><td class="file-ref">Campaigns.jsx</td><td>11.2 KB</td><td><span class="badge badge-done">Complete</span></td></tr>
+                    <tr><td>AI Training</td><td class="file-ref">AITraining.jsx</td><td>36.0 KB</td><td><span class="badge badge-done">Complete</span></td></tr>
+                    <tr><td>Agency</td><td class="file-ref">Agency.jsx</td><td>24.5 KB</td><td><span class="badge badge-done">Complete</span></td></tr>
+                    <tr><td>Settings</td><td class="file-ref">Settings.jsx</td><td>26.4 KB</td><td><span class="badge badge-done">Complete</span></td></tr>
+                    <tr><td>Profile</td><td class="file-ref">Profile.jsx</td><td>9.4 KB</td><td><span class="badge badge-done">Complete</span></td></tr>
+                    <tr><td>Logs</td><td class="file-ref">Logs.jsx</td><td>4.8 KB</td><td><span class="badge badge-done">Complete</span></td></tr>
+                    <tr><td>WebRTC</td><td class="file-ref">WebRTC.jsx</td><td>7.0 KB</td><td><span class="badge badge-done">Complete</span></td></tr>
+                </tbody>
+            </table>
+
+            <h3>2.2 Components & Infrastructure</h3>
+            <ul>
+                <li>Sidebar navigation component <span class="file-ref">Sidebar.jsx</span></li>
+                <li>Modal component (reusable dialog) <span class="file-ref">Modal.jsx</span></li>
+                <li>Welcome Banner with animations <span class="file-ref">WelcomeBanner.jsx</span></li>
+                <li>Empty State component <span class="file-ref">EmptyState.jsx</span></li>
+                <li>Permission Guard for RBAC <span class="file-ref">PermissionGuard.jsx</span></li>
+                <li>Auth Context for JWT state management <span class="file-ref">AuthContext.jsx</span></li>
+                <li>Axios API client configuration <span class="file-ref">api.js</span></li>
+                <li>Tailwind CSS styling with custom theme <span class="file-ref">tailwind.config.js</span></li>
+                <li>Production build ready with dist folder generated</li>
+            </ul>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ======== MOBILE ======== -->
+        <div class="card">
+            <h2>📱 3. Mobile Application (Flutter / Dart)</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 16px;">Cross-platform Flutter application with 13 feature modules, Riverpod state management, and LiveKit WebRTC integration.</p>
+
+            <h3>3.1 Feature Modules (13 Completed)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature Module</th>
+                        <th>Sub-Modules</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Auth</td><td>Models, Presentation, Providers, Repositories</td><td><span class="badge badge-done">Complete</span></td></tr>
+                    <tr><td>Calls</td><td>Models, Presentation, Providers, Services</td><td><span class="badge badge-done">Complete</span></td></tr>
+                    <tr><td>Dashboard</td><td>Models, Presentation, Providers, Widgets</td><td><span class="badge badge-done">Complete</span></td></tr>
+                    <tr><td>Device</td><td>Presentation, Providers</td><td><span class="badge badge-done">Complete</span></td></tr>
+                    <tr><td>Logs</td><td>Providers, Presentation</td><td><span class="badge badge-done">Complete</span></td></tr>
+                    <tr><td>Navigation</td><td>Router configuration (GoRouter)</td><td><span class="badge badge-done">Complete</span></td></tr>
+                    <tr><td>Settings</td><td>Presentation layer</td><td><span class="badge badge-done">Complete</span></td></tr>
+                    <tr><td>Splash</td><td>Splash screen</td><td><span class="badge badge-done">Complete</span></td></tr>
+                    <tr><td>Supervisor</td><td>Presentation, Services</td><td><span class="badge badge-done">Complete</span></td></tr>
+                    <tr><td>Transcripts</td><td>Transcript viewer</td><td><span class="badge badge-done">Complete</span></td></tr>
+                    <tr><td>AI</td><td>AI feature module</td><td><span class="badge badge-done">Complete</span></td></tr>
+                    <tr><td>Analytics</td><td>Analytics presentation</td><td><span class="badge badge-done">Complete</span></td></tr>
+                    <tr><td>Script</td><td>Call scripts feature</td><td><span class="badge badge-done">Complete</span></td></tr>
+                </tbody>
+            </table>
+
+            <h3>3.2 Core Infrastructure</h3>
+            <ul>
+                <li>App configuration with environment-based API URLs <span class="file-ref">core/config/app_config.dart</span></li>
+                <li>LiveKit WebRTC client integration for real-time audio</li>
+                <li>Android native audio routing (MODE_IN_COMMUNICATION)</li>
+                <li>Call event listener service <span class="file-ref">calls/services/call_event_listener.dart</span></li>
+                <li>Riverpod state management across all features</li>
+                <li>GoRouter navigation with auth guards</li>
+                <li>Dio HTTP client for backend API calls</li>
+                <li>Android & iOS platform configurations</li>
+            </ul>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ======== DOCUMENTATION ======== -->
+        <div class="card">
+            <h2>📄 4. Documentation & Analysis</h2>
+            <ul>
+                <li>Full project HTML documentation <span class="file-ref">docs/NexaVoice_Project_Documentation.html</span></li>
+                <li>Technology stack & workflow document <span class="file-ref">tech_stack_and_workflow.md</span></li>
+                <li>Detailed technology stack with usage docs <span class="file-ref">docs/technology_stack.md</span></li>
+                <li>API costing analysis — monthly projections for all services <span class="file-ref">api_costing_analysis.md</span></li>
+            </ul>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- TECH STACK -->
+        <div class="card">
+            <h2>🔧 5. Technology Stack Summary</h2>
+            <h3>Backend</h3>
+            <div>
+                <span class="tech-tag">Python 3</span>
+                <span class="tech-tag">FastAPI</span>
+                <span class="tech-tag">Uvicorn</span>
+                <span class="tech-tag">SQLAlchemy</span>
+                <span class="tech-tag">Alembic</span>
+                <span class="tech-tag">PostgreSQL</span>
+                <span class="tech-tag">pgvector</span>
+                <span class="tech-tag">LiveKit</span>
+                <span class="tech-tag">Deepgram</span>
+                <span class="tech-tag">Google Gemini</span>
+                <span class="tech-tag">ElevenLabs</span>
+                <span class="tech-tag">Cartesia</span>
+                <span class="tech-tag">Salesforce</span>
+                <span class="tech-tag">AWS S3</span>
+                <span class="tech-tag">JWT / bcrypt</span>
+            </div>
+            <h3>Frontend</h3>
+            <div>
+                <span class="tech-tag">React 19</span>
+                <span class="tech-tag">Vite</span>
+                <span class="tech-tag">Tailwind CSS</span>
+                <span class="tech-tag">Framer Motion</span>
+                <span class="tech-tag">Recharts</span>
+                <span class="tech-tag">Axios</span>
+                <span class="tech-tag">React Router</span>
+                <span class="tech-tag">Lucide Icons</span>
+            </div>
+            <h3>Mobile</h3>
+            <div>
+                <span class="tech-tag">Flutter</span>
+                <span class="tech-tag">Dart</span>
+                <span class="tech-tag">Riverpod</span>
+                <span class="tech-tag">GoRouter</span>
+                <span class="tech-tag">LiveKit Client</span>
+                <span class="tech-tag">Dio</span>
+            </div>
+            <h3>Infrastructure</h3>
+            <div>
+                <span class="tech-tag">Docker</span>
+                <span class="tech-tag">Docker Compose</span>
+                <span class="tech-tag">Nginx</span>
+                <span class="tech-tag">Certbot / SSL</span>
+                <span class="tech-tag">AWS EC2</span>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>NexaVoice — Salesforce AI Calling Agent Platform</p>
+            <p>© 2026 | Completed Work Report | To save as PDF, press <strong>Ctrl+P</strong> and select "Save as PDF"</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -90,8 +90,19 @@ class Settings(BaseSettings):
     # AI Configuration
     # ==========================================================
     AI_MODEL: str = "gemini-flash-latest"
-    AI_TEMPERATURE: float = 0.4
+    AI_TEMPERATURE: float = 0.15
     AI_MAX_TOKENS: int = 1000
+
+    # ==========================================================
+    # AI Safety Guardrails
+    # ==========================================================
+    AI_MAX_CALL_DURATION: int = 600           # 10 minutes max per call
+    AI_MAX_TURNS_PER_CALL: int = 30           # Max conversation turns per call
+    AI_MAX_RESPONSE_LENGTH: int = 500         # Max characters per AI response
+    AI_ENABLE_INPUT_GUARDRAILS: bool = True    # Pre-processing input validation
+    AI_ENABLE_OUTPUT_GUARDRAILS: bool = True   # Post-processing output validation
+    AI_ENABLE_SENTIMENT_ALERTS: bool = True    # Sentiment-based supervisor alerts
+    AI_ENABLE_STATE_MACHINE: bool = True       # Graph-based conversation flow
 
     # ==========================================================
     # Logging

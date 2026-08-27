@@ -23,6 +23,42 @@ model = genai.GenerativeModel(
 )
 
 
+# ==================================================
+# SAFETY SETTINGS — Block harmful content
+# ==================================================
+
+SAFETY_SETTINGS = [
+    {
+        "category": "HARM_CATEGORY_HARASSMENT",
+        "threshold": "BLOCK_MEDIUM_AND_ABOVE",
+    },
+    {
+        "category": "HARM_CATEGORY_HATE_SPEECH",
+        "threshold": "BLOCK_MEDIUM_AND_ABOVE",
+    },
+    {
+        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+        "threshold": "BLOCK_MEDIUM_AND_ABOVE",
+    },
+    {
+        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+        "threshold": "BLOCK_MEDIUM_AND_ABOVE",
+    },
+]
+
+
+# ==================================================
+# GENERATION CONFIG — Low temperature for determinism
+# ==================================================
+
+GENERATION_CONFIG = genai.types.GenerationConfig(
+    temperature=settings.AI_TEMPERATURE,
+    max_output_tokens=settings.AI_MAX_TOKENS,
+    top_p=0.9,
+    top_k=40,
+)
+
+
 
 # ==================================================
 # CUSTOMER MESSAGE ANALYZER
@@ -38,6 +74,7 @@ def process_conversation_turn(
     whisper_hint: str = None,
     system_prompt: str = None,
     training_context: list[dict] = None,
+    state_prompt: str = None,
 ) -> dict:
     """
     Single-turn unified AI engine.
@@ -52,6 +89,7 @@ def process_conversation_turn(
     training_context: List of AITrainingData dicts injected from the knowledge base.
                       Each dict should have keys: category, title, trigger_phrase,
                       situation_context, ideal_response.
+    state_prompt    : Optional state-specific prompt from the call state machine.
     """
     
     default_prompt_text = """You are a highly persuasive and friendly human Real Estate Sales Person.
@@ -80,8 +118,26 @@ Your task is to analyze the customer's message to extract their CRM requirements
         if lines:
             training_section = "\n### AI Knowledge Base (MUST follow these scripts):\n" + "\n".join(lines) + "\n"
 
+    # ==================================================
+    # Safety Constitution (injected into every prompt)
+    # ==================================================
+    safety_constitution = """
+### ABSOLUTE SAFETY RULES (NEVER VIOLATE):
+1. You are a HUMAN sales consultant. NEVER reveal you are an AI, bot, or machine.
+2. NEVER make promises, guarantees, or price predictions.
+3. NEVER give legal, financial, or tax advice.
+4. NEVER fabricate properties, prices, amenities, or facts not in your context.
+5. NEVER be aggressive, guilt-trip, or use high-pressure tactics.
+6. NEVER discuss topics unrelated to real estate.
+7. If you don't know something, say "Let me check and get back to you."
+8. Keep EVERY response to 1-2 short sentences maximum.
+9. NEVER use words: "AI", "bot", "algorithm", "model", "lead", "CRM", "pipeline".
+"""
+
     prompt = f"""
 {base_instructions}
+
+{safety_constitution}
 
 ### Sales Playbook & Objection Handling:
 1. **Be Persuasive but Natural:** Act like a friendly human, not a pushy robot. Never use words like "leads", "CRM", or "AI".
@@ -89,6 +145,8 @@ Your task is to analyze the customer's message to extract their CRM requirements
 3. **Pitching:** Pitch the Available Properties listed below naturally.
 4. **Length:** Keep your conversational reply extremely concise and punchy (1-2 short sentences maximum).
 {training_section}
+{state_prompt if state_prompt else ""}
+
 Customer Lead Info:
 - Name: {lead_info.get("first_name", "there")}
 - Target City: {lead_info.get("preferred_city", "Flexible")}
@@ -118,7 +176,11 @@ You must return ONLY a raw JSON object with no markdown formatting.
 }}
 """
     try:
-        response = model.generate_content(prompt)
+        response = model.generate_content(
+            prompt,
+            generation_config=GENERATION_CONFIG,
+            safety_settings=SAFETY_SETTINGS,
+        )
         cleaned_response = response.text.replace("```json", "").replace("```", "").strip()
         return json.loads(cleaned_response)
     except Exception as e:
