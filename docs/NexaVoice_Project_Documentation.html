@@ -1,0 +1,2019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexaVoice — Complete Project Documentation</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-orange: #f97316;
+            --accent-pink: #ec4899;
+            --accent-red: #ef4444;
+            --border-color: rgba(255,255,255,0.08);
+            --glass-bg: rgba(30,41,59,0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 32px;
+        }
+
+        /* ===================== COVER PAGE ===================== */
+        .cover-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            position: relative;
+            overflow: hidden;
+            page-break-after: always;
+        }
+
+        .cover-page::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(59,130,246,0.15), transparent 70%);
+            top: -100px;
+            right: -100px;
+            border-radius: 50%;
+        }
+
+        .cover-page::after {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(139,92,246,0.12), transparent 70%);
+            bottom: -150px;
+            left: -100px;
+            border-radius: 50%;
+        }
+
+        .cover-logo {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            margin-bottom: 32px;
+            box-shadow: 0 0 60px rgba(59,130,246,0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .cover-title {
+            font-size: 56px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cover-subtitle {
+            font-size: 22px;
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-bottom: 48px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cover-meta {
+            display: flex;
+            gap: 32px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cover-meta-item {
+            background: var(--glass-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 24px;
+            backdrop-filter: blur(12px);
+        }
+
+        .cover-meta-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .cover-meta-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* ===================== SECTION STYLES ===================== */
+        .section {
+            margin-bottom: 56px;
+            page-break-inside: avoid;
+        }
+
+        .section-number {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 8px;
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            margin-top: 40px;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--accent-blue);
+            padding-bottom: 8px;
+        }
+
+        h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            margin-top: 28px;
+            color: var(--accent-cyan);
+        }
+
+        h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            margin-top: 20px;
+            color: var(--accent-purple);
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            font-size: 15px;
+        }
+
+        .lead-text {
+            font-size: 17px;
+            color: #cbd5e1;
+            line-height: 1.8;
+        }
+
+        /* ===================== CARDS ===================== */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .card-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .card-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .card-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ===================== GRID ===================== */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* ===================== TECH BADGE ===================== */
+        .tech-badge-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .tech-badge {
+            background: rgba(59,130,246,0.1);
+            border: 1px solid rgba(59,130,246,0.2);
+            color: var(--accent-blue);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .tech-badge.purple {
+            background: rgba(139,92,246,0.1);
+            border-color: rgba(139,92,246,0.2);
+            color: var(--accent-purple);
+        }
+
+        .tech-badge.green {
+            background: rgba(16,185,129,0.1);
+            border-color: rgba(16,185,129,0.2);
+            color: var(--accent-green);
+        }
+
+        .tech-badge.cyan {
+            background: rgba(6,182,212,0.1);
+            border-color: rgba(6,182,212,0.2);
+            color: var(--accent-cyan);
+        }
+
+        .tech-badge.orange {
+            background: rgba(249,115,22,0.1);
+            border-color: rgba(249,115,22,0.2);
+            color: var(--accent-orange);
+        }
+
+        .tech-badge.pink {
+            background: rgba(236,72,153,0.1);
+            border-color: rgba(236,72,153,0.2);
+            color: var(--accent-pink);
+        }
+
+        /* ===================== TABLE ===================== */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        thead th {
+            background: rgba(59,130,246,0.1);
+            color: var(--accent-blue);
+            font-weight: 700;
+            text-align: left;
+            padding: 12px 16px;
+            border-bottom: 2px solid rgba(59,130,246,0.2);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        tbody td {
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        tbody tr:hover {
+            background: rgba(255,255,255,0.02);
+        }
+
+        tbody td:first-child {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+        }
+
+        /* ===================== FLOWCHART CONTAINER ===================== */
+        .mermaid-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            margin: 24px 0;
+            overflow-x: auto;
+        }
+
+        .mermaid-container .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+
+        .mermaid-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* ===================== CALLOUT ===================== */
+        .callout {
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin: 20px 0;
+            border-left: 4px solid;
+        }
+
+        .callout.info {
+            background: rgba(59,130,246,0.08);
+            border-color: var(--accent-blue);
+        }
+
+        .callout.warning {
+            background: rgba(249,115,22,0.08);
+            border-color: var(--accent-orange);
+        }
+
+        .callout.success {
+            background: rgba(16,185,129,0.08);
+            border-color: var(--accent-green);
+        }
+
+        .callout-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+
+        .callout-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ===================== LIST ===================== */
+        ul, ol {
+            margin-bottom: 16px;
+            padding-left: 24px;
+        }
+
+        li {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 6px;
+            line-height: 1.6;
+        }
+
+        li strong {
+            color: var(--text-primary);
+        }
+
+        /* ===================== CODE ===================== */
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(59,130,246,0.1);
+            color: var(--accent-cyan);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        /* ===================== SEPARATOR ===================== */
+        .page-break {
+            page-break-before: always;
+        }
+
+        hr {
+            border: none;
+            height: 1px;
+            background: var(--border-color);
+            margin: 40px 0;
+        }
+
+        /* ===================== FOOTER ===================== */
+        .doc-footer {
+            text-align: center;
+            padding: 48px 0 32px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* ===================== STAT HIGHLIGHT ===================== */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .stat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ===================== TOC ===================== */
+        .toc {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            margin: 32px 0;
+        }
+
+        .toc-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .toc-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .toc-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toc-list li:last-child {
+            border-bottom: none;
+        }
+
+        .toc-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent-blue);
+            min-width: 32px;
+        }
+
+        .toc-text {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* ===================== PIPELINE STEP ===================== */
+        .pipeline {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            margin: 24px 0;
+        }
+
+        .pipeline-step {
+            display: flex;
+            gap: 16px;
+            position: relative;
+        }
+
+        .pipeline-line {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 40px;
+            flex-shrink: 0;
+        }
+
+        .pipeline-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            border: 3px solid;
+        }
+
+        .pipeline-connector {
+            width: 2px;
+            flex-grow: 1;
+            min-height: 20px;
+            background: var(--border-color);
+        }
+
+        .pipeline-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 20px;
+            flex-grow: 1;
+            margin-bottom: 8px;
+        }
+
+        .pipeline-content h4 {
+            margin-top: 0;
+            margin-bottom: 4px;
+        }
+
+        .pipeline-content p {
+            margin-bottom: 0;
+            font-size: 13px;
+        }
+
+        /* ===================== ARCHITECTURE LAYERS ===================== */
+        .arch-layer {
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .arch-layer-header {
+            padding: 12px 20px;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .arch-layer-body {
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .arch-block {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* ===================== PRINT ===================== */
+        @media print {
+            body { background: white; color: #1e293b; }
+            .cover-page { background: white; }
+            .card, .mermaid-container, .toc, .callout, .stat-item, .arch-layer {
+                break-inside: avoid;
+            }
+            .cover-title {
+                -webkit-text-fill-color: #3b82f6;
+                color: #3b82f6;
+            }
+            code { background: #f1f5f9; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ==================== COVER PAGE ==================== -->
+<div class="cover-page">
+    <div class="cover-logo">🎙️</div>
+    <h1 class="cover-title">NexaVoice</h1>
+    <p class="cover-subtitle">AI-Powered Real Estate Voice Calling Platform<br>Complete Technical Documentation & Workflow Guide</p>
+    <div class="cover-meta">
+        <div class="cover-meta-item">
+            <div class="cover-meta-label">Version</div>
+            <div class="cover-meta-value">1.0.0</div>
+        </div>
+        <div class="cover-meta-item">
+            <div class="cover-meta-label">Platform</div>
+            <div class="cover-meta-value">Web + Mobile + Backend</div>
+        </div>
+        <div class="cover-meta-item">
+            <div class="cover-meta-label">Industry</div>
+            <div class="cover-meta-value">Real Estate Sales</div>
+        </div>
+        <div class="cover-meta-item">
+            <div class="cover-meta-label">Date</div>
+            <div class="cover-meta-value">August 2026</div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MAIN CONTENT ==================== -->
+<div class="container">
+
+    <!-- TABLE OF CONTENTS -->
+    <div class="toc">
+        <div class="toc-title">📋 Table of Contents</div>
+        <ul class="toc-list">
+            <li><span class="toc-num">01</span><span class="toc-text">Project Overview & Executive Summary</span></li>
+            <li><span class="toc-num">02</span><span class="toc-text">System Architecture Overview</span></li>
+            <li><span class="toc-num">03</span><span class="toc-text">Complete Technology Stack</span></li>
+            <li><span class="toc-num">04</span><span class="toc-text">AI Voice Call Pipeline — End-to-End Workflow</span></li>
+            <li><span class="toc-num">05</span><span class="toc-text">Backend Architecture & API Design</span></li>
+            <li><span class="toc-num">06</span><span class="toc-text">Database Schema & Data Models</span></li>
+            <li><span class="toc-num">07</span><span class="toc-text">Frontend Web Dashboard</span></li>
+            <li><span class="toc-num">08</span><span class="toc-text">Flutter Mobile Application</span></li>
+            <li><span class="toc-num">09</span><span class="toc-text">Salesforce CRM Integration & RAG Pipeline</span></li>
+            <li><span class="toc-num">10</span><span class="toc-text">AI Training & Knowledge Base System</span></li>
+            <li><span class="toc-num">11</span><span class="toc-text">Authentication & Multi-Tenancy</span></li>
+            <li><span class="toc-num">12</span><span class="toc-text">Deployment Architecture</span></li>
+            <li><span class="toc-num">13</span><span class="toc-text">API Costing Analysis</span></li>
+            <li><span class="toc-num">14</span><span class="toc-text">Project Directory Structure</span></li>
+        </ul>
+    </div>
+
+    <!-- ==================== SECTION 1 ==================== -->
+    <div class="section">
+        <div class="section-number">Section 01</div>
+        <h1>Project Overview & Executive Summary</h1>
+        <p class="lead-text">
+            <strong>NexaVoice</strong> is a full-stack, AI-powered voice calling platform designed for the <strong>Indian Real Estate industry</strong>. 
+            It automates outbound sales calls to prospective property buyers (leads) using an intelligent AI agent that can have natural, 
+            persuasive conversations in English and Hinglish. The platform replaces human cold-calling operations by combining real-time 
+            speech recognition, large language model intelligence, and ultra-realistic text-to-speech voice synthesis.
+        </p>
+
+        <div class="stat-grid">
+            <div class="stat-item">
+                <div class="stat-value" style="color: var(--accent-blue);">3</div>
+                <div class="stat-label">Client Apps</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" style="color: var(--accent-purple);">6</div>
+                <div class="stat-label">AI/ML APIs</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" style="color: var(--accent-green);">25+</div>
+                <div class="stat-label">REST APIs</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" style="color: var(--accent-orange);">12</div>
+                <div class="stat-label">DB Models</div>
+            </div>
+        </div>
+
+        <h3>What Does NexaVoice Do?</h3>
+        <ol>
+            <li><strong>Imports Leads</strong> from Salesforce CRM or CSV files into its local database</li>
+            <li><strong>Dispatches AI Voice Calls</strong> to leads via a connected Android device (telephony gateway)</li>
+            <li><strong>Runs a real-time AI conversation</strong> — the AI speaks naturally, handles objections, recommends properties, and extracts CRM data automatically</li>
+            <li><strong>Records everything</strong> — full conversation transcripts, call recordings (stored in AWS S3), and call analytics</li>
+            <li><strong>Auto-updates the CRM</strong> — detected city preference, budget, bedrooms, and intent are automatically written back to the lead record</li>
+            <li><strong>Provides a Supervisor Console</strong> — supervisors can monitor live calls, see real-time transcripts, and "whisper" instructions to the AI mid-call</li>
+        </ol>
+    </div>
+
+    <!-- ==================== SECTION 2 ==================== -->
+    <div class="section page-break">
+        <div class="section-number">Section 02</div>
+        <h1>System Architecture Overview</h1>
+        <p class="lead-text">The system follows a multi-tier architecture with three client applications communicating with a centralized FastAPI backend, which orchestrates all AI services, telephony, and data storage.</p>
+
+        <div class="mermaid-container">
+            <div class="mermaid-title">🏗️ High-Level System Architecture</div>
+            <div class="mermaid">
+graph TB
+    subgraph CLIENTS["🖥️ Client Applications"]
+        WEB["React Web Dashboard<br/>(Admin/Supervisor)"]
+        MOB["Flutter Mobile App<br/>(Telephony Gateway)"]
+        WRT["WebRTC Console<br/>(Live Audio Monitor)"]
+    end
+
+    subgraph BACKEND["⚙️ FastAPI Backend Server"]
+        API["REST API Layer<br/>(25+ Endpoints)"]
+        WS["WebSocket Server<br/>(Real-Time Events)"]
+        AUTH["Auth & RBAC<br/>(JWT + Roles)"]
+        ORC["Call Orchestrator<br/>(Pipeline Manager)"]
+        AIS["AI Service<br/>(Gemini Engine)"]
+        SFS["Salesforce Service<br/>(CRM Sync)"]
+    end
+
+    subgraph AI_SERVICES["🤖 AI & Voice Services"]
+        DG["Deepgram<br/>Speech-to-Text"]
+        GM["Google Gemini<br/>LLM Brain"]
+        EL["ElevenLabs<br/>Text-to-Speech"]
+        EMB["Gemini Embeddings<br/>text-embedding-004"]
+    end
+
+    subgraph STORAGE["💾 Data & Storage"]
+        PG["PostgreSQL + pgvector<br/>(Primary DB)"]
+        S3["AWS S3<br/>(Call Recordings)"]
+    end
+
+    subgraph TELEPHONY["📞 Telephony"]
+        TATA["Tata Smartflo<br/>(SIP Trunk)"]
+        AND["Android Phone<br/>(Gateway Device)"]
+    end
+
+    WEB -->|"HTTP + WS"| API
+    MOB -->|"WebSocket"| WS
+    WRT -->|"WebSocket"| WS
+
+    API --> AUTH
+    API --> ORC
+    API --> AIS
+    API --> SFS
+
+    ORC --> DG
+    AIS --> GM
+    AIS --> EMB
+    ORC --> EL
+
+    AIS --> PG
+    SFS --> PG
+    ORC --> S3
+
+    WS --> MOB
+    MOB --> AND
+    AND --> TATA
+
+    style CLIENTS fill:#1e1b4b,stroke:#3b82f6,color:#f8fafc
+    style BACKEND fill:#1e293b,stroke:#8b5cf6,color:#f8fafc
+    style AI_SERVICES fill:#1a2332,stroke:#06b6d4,color:#f8fafc
+    style STORAGE fill:#1a2e1a,stroke:#10b981,color:#f8fafc
+    style TELEPHONY fill:#2e1a1a,stroke:#f97316,color:#f8fafc
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SECTION 3 ==================== -->
+    <div class="section page-break">
+        <div class="section-number">Section 03</div>
+        <h1>Complete Technology Stack</h1>
+
+        <h2>Backend Technologies</h2>
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon" style="background: rgba(59,130,246,0.15);">🐍</div>
+                    <div>
+                        <div class="card-title">Python 3.11 + FastAPI</div>
+                    </div>
+                </div>
+                <div class="card-desc">High-performance async web framework. Handles all REST endpoints, WebSocket connections, and AI service orchestration. Runs on Uvicorn ASGI server.</div>
+                <div class="tech-badge-group" style="margin-top: 12px;">
+                    <span class="tech-badge">FastAPI 0.128</span>
+                    <span class="tech-badge">Uvicorn 0.40</span>
+                    <span class="tech-badge">Pydantic v2</span>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon" style="background: rgba(16,185,129,0.15);">🗄️</div>
+                    <div>
+                        <div class="card-title">PostgreSQL + pgvector</div>
+                    </div>
+                </div>
+                <div class="card-desc">Primary relational database with vector extension for storing AI embeddings. Used for all CRM data storage and semantic search via cosine similarity.</div>
+                <div class="tech-badge-group" style="margin-top: 12px;">
+                    <span class="tech-badge green">PostgreSQL 15</span>
+                    <span class="tech-badge green">pgvector</span>
+                    <span class="tech-badge green">SQLAlchemy 2.0</span>
+                    <span class="tech-badge green">Alembic</span>
+                </div>
+            </div>
+        </div>
+
+        <h2>AI & Voice Pipeline</h2>
+        <div class="grid-3">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon" style="background: rgba(139,92,246,0.15);">🎤</div>
+                    <div><div class="card-title">Deepgram</div></div>
+                </div>
+                <div class="card-desc"><strong>Speech-to-Text (STT).</strong> Nova-2 model. Real-time WebSocket streaming with Hindi/Hinglish support. Converts customer speech to text in real-time.</div>
+                <div class="tech-badge-group" style="margin-top: 12px;">
+                    <span class="tech-badge purple">Nova-2 Model</span>
+                    <span class="tech-badge purple">Hindi (hi)</span>
+                    <span class="tech-badge purple">16kHz PCM</span>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon" style="background: rgba(6,182,212,0.15);">🧠</div>
+                    <div><div class="card-title">Google Gemini</div></div>
+                </div>
+                <div class="card-desc"><strong>LLM Brain.</strong> Handles intent extraction, CRM data extraction, and conversational reply generation in a single API call. Also generates 768-dim embeddings for RAG.</div>
+                <div class="tech-badge-group" style="margin-top: 12px;">
+                    <span class="tech-badge cyan">Gemini Flash</span>
+                    <span class="tech-badge cyan">text-embedding-004</span>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon" style="background: rgba(236,72,153,0.15);">🔊</div>
+                    <div><div class="card-title">ElevenLabs</div></div>
+                </div>
+                <div class="card-desc"><strong>Text-to-Speech (TTS).</strong> Generates ultra-realistic human voice from AI response text. Uses multilingual_v2 model with MP3 output at 44.1kHz.</div>
+                <div class="tech-badge-group" style="margin-top: 12px;">
+                    <span class="tech-badge pink">multilingual_v2</span>
+                    <span class="tech-badge pink">MP3 44.1kHz</span>
+                </div>
+            </div>
+        </div>
+
+        <h2>Frontend Technologies</h2>
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon" style="background: rgba(59,130,246,0.15);">⚛️</div>
+                    <div><div class="card-title">React 19 + Vite 8</div></div>
+                </div>
+                <div class="card-desc">Modern SPA web dashboard. Built with React 19, Vite 8 for HMR & builds, TailwindCSS for styling, Framer Motion for animations, and Recharts for analytics visualizations.</div>
+                <div class="tech-badge-group" style="margin-top: 12px;">
+                    <span class="tech-badge">React 19</span>
+                    <span class="tech-badge">Vite 8</span>
+                    <span class="tech-badge">TailwindCSS 3</span>
+                    <span class="tech-badge">Recharts</span>
+                    <span class="tech-badge">Framer Motion</span>
+                    <span class="tech-badge">Axios</span>
+                    <span class="tech-badge">Lucide Icons</span>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon" style="background: rgba(6,182,212,0.15);">📱</div>
+                    <div><div class="card-title">Flutter (Dart 3.9)</div></div>
+                </div>
+                <div class="card-desc">Cross-platform mobile app serving as the telephony gateway. Connects to the backend via WebSocket, receives call assignments, places real phone calls, and streams audio for AI processing.</div>
+                <div class="tech-badge-group" style="margin-top: 12px;">
+                    <span class="tech-badge cyan">Flutter</span>
+                    <span class="tech-badge cyan">Riverpod</span>
+                    <span class="tech-badge cyan">GoRouter</span>
+                    <span class="tech-badge cyan">LiveKit</span>
+                    <span class="tech-badge cyan">Dio</span>
+                    <span class="tech-badge cyan">WebSocket</span>
+                </div>
+            </div>
+        </div>
+
+        <h2>Cloud & Infrastructure</h2>
+        <div class="grid-3">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon" style="background: rgba(249,115,22,0.15);">☁️</div>
+                    <div><div class="card-title">AWS S3</div></div>
+                </div>
+                <div class="card-desc">Stores call recordings (WAV files) with pre-signed URL generation for playback.</div>
+                <div class="tech-badge-group" style="margin-top: 12px;">
+                    <span class="tech-badge orange">boto3</span>
+                    <span class="tech-badge orange">ap-south-1</span>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon" style="background: rgba(16,185,129,0.15);">🐳</div>
+                    <div><div class="card-title">Docker</div></div>
+                </div>
+                <div class="card-desc">Containerized deployment with Docker Compose. 4 services: Backend, PostgreSQL, Nginx, Certbot.</div>
+                <div class="tech-badge-group" style="margin-top: 12px;">
+                    <span class="tech-badge green">Docker Compose</span>
+                    <span class="tech-badge green">Python 3.11-slim</span>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon" style="background: rgba(139,92,246,0.15);">🌐</div>
+                    <div><div class="card-title">Nginx + Certbot</div></div>
+                </div>
+                <div class="card-desc">Reverse proxy and SSL termination. Serves the React frontend static build and proxies API requests to FastAPI.</div>
+                <div class="tech-badge-group" style="margin-top: 12px;">
+                    <span class="tech-badge purple">Nginx</span>
+                    <span class="tech-badge purple">Let's Encrypt</span>
+                </div>
+            </div>
+        </div>
+
+        <h2>Third-Party Integrations</h2>
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon" style="background: rgba(59,130,246,0.15);">☁️</div>
+                    <div><div class="card-title">Salesforce CRM</div></div>
+                </div>
+                <div class="card-desc">OAuth 2.0 Username-Password flow. Syncs leads and knowledge articles from Salesforce into the local database. Includes mock sandbox mode for development.</div>
+                <div class="tech-badge-group" style="margin-top: 12px;">
+                    <span class="tech-badge">simple-salesforce</span>
+                    <span class="tech-badge">REST API v60</span>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon" style="background: rgba(249,115,22,0.15);">📞</div>
+                    <div><div class="card-title">Tata Smartflo (SIP)</div></div>
+                </div>
+                <div class="card-desc">Enterprise telephony provider for routing real phone calls over the PSTN network. Handles Indian phone number dialing and call routing.</div>
+                <div class="tech-badge-group" style="margin-top: 12px;">
+                    <span class="tech-badge orange">SIP Trunk</span>
+                    <span class="tech-badge orange">PSTN Routing</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SECTION 4 ==================== -->
+    <div class="section page-break">
+        <div class="section-number">Section 04</div>
+        <h1>AI Voice Call Pipeline — End-to-End Workflow</h1>
+        <p class="lead-text">This is the core workflow of NexaVoice. The following flowchart shows exactly what happens from the moment a supervisor clicks "Start Call" to when the call ends and data is saved.</p>
+
+        <div class="mermaid-container">
+            <div class="mermaid-title">📞 Complete AI Voice Call Workflow</div>
+            <div class="mermaid">
+flowchart TD
+    A["👤 Supervisor clicks<br/>'Start Call' on Dashboard"] --> B["📋 Backend creates Call record<br/>in PostgreSQL"]
+    B --> C{"📱 Mobile App<br/>connected via WebSocket?"}
+    C -->|"No"| C1["❌ Error: No gateway<br/>device available"]
+    C -->|"Yes"| D["📨 Backend broadcasts<br/>CALL_ASSIGNED via WebSocket"]
+    D --> E["📱 Flutter App receives<br/>assignment & dials phone number"]
+    E --> F["📞 Native phone call<br/>placed via Android dialer"]
+    F --> G["🔗 Flutter opens WebSocket<br/>to /realtime/call/{call_id}"]
+    G --> H["🎙️ Backend starts<br/>Deepgram live connection"]
+    H --> I["🔊 AI speaks intro<br/>greeting via ElevenLabs TTS"]
+    I --> J["🔄 Audio Streaming Loop<br/>begins"]
+
+    J --> K["🎤 Customer speaks<br/>(audio streamed from phone)"]
+    K --> L["📡 Deepgram processes<br/>audio stream in real-time"]
+    L --> M{"📝 Transcript<br/>is_final?"}
+    M -->|"No (interim)"| K
+    M -->|"Yes (final)"| N["💾 Save customer message<br/>to conversations table"]
+    N --> O["🧠 Gemini AI processes<br/>message with full context"]
+    O --> P["📊 Extract CRM data<br/>(city, budget, bedrooms, intent)"]
+    P --> Q["✏️ Auto-update Lead record<br/>in PostgreSQL"]
+    Q --> R["💬 Generate conversational<br/>AI reply (1-2 sentences)"]
+    R --> S["💾 Save AI reply to<br/>conversations table"]
+    S --> T["🔊 ElevenLabs converts<br/>reply to speech audio"]
+    T --> U["📤 Send audio bytes<br/>back through WebSocket"]
+    U --> V["📱 Flutter plays<br/>AI voice to customer"]
+    V --> K
+
+    V --> W{"📞 Call ends?<br/>(disconnect)"}
+    W -->|"No"| K
+    W -->|"Yes"| X["⏹️ Close Deepgram<br/>connection"]
+    X --> Y["💾 Upload recording<br/>to AWS S3"]
+    Y --> Z["📊 Update Call record<br/>(status, transcript, recording_url)"]
+    Z --> AA["📨 Broadcast CALL_ENDED<br/>event to all clients"]
+
+    style A fill:#1e1b4b,stroke:#3b82f6,color:#fff
+    style O fill:#1e1b4b,stroke:#8b5cf6,color:#fff
+    style L fill:#1e1b4b,stroke:#06b6d4,color:#fff
+    style T fill:#1e1b4b,stroke:#ec4899,color:#fff
+    style Y fill:#1e1b4b,stroke:#f97316,color:#fff
+    style AA fill:#1a2e1a,stroke:#10b981,color:#fff
+            </div>
+        </div>
+
+        <h2>Step-by-Step Breakdown</h2>
+        <div class="pipeline">
+            <div class="pipeline-step">
+                <div class="pipeline-line">
+                    <div class="pipeline-dot" style="border-color: var(--accent-blue);"></div>
+                    <div class="pipeline-connector"></div>
+                </div>
+                <div class="pipeline-content">
+                    <h4 style="color: var(--accent-blue);">Step 1 — Call Dispatch</h4>
+                    <p>Supervisor triggers a call from the React dashboard. The backend creates a <code>Call</code> record (status: SCHEDULED) linked to the target <code>Lead</code>, then broadcasts a <code>CALL_ASSIGNED</code> event via WebSocket to all connected mobile devices.</p>
+                </div>
+            </div>
+            <div class="pipeline-step">
+                <div class="pipeline-line">
+                    <div class="pipeline-dot" style="border-color: var(--accent-purple);"></div>
+                    <div class="pipeline-connector"></div>
+                </div>
+                <div class="pipeline-content">
+                    <h4 style="color: var(--accent-purple);">Step 2 — Phone Call & WebSocket</h4>
+                    <p>The Flutter app receives the assignment, dials the lead's phone number using the native Android dialer, and simultaneously opens a realtime WebSocket connection to the backend at <code>/realtime/call/{call_id}</code>.</p>
+                </div>
+            </div>
+            <div class="pipeline-step">
+                <div class="pipeline-line">
+                    <div class="pipeline-dot" style="border-color: var(--accent-cyan);"></div>
+                    <div class="pipeline-connector"></div>
+                </div>
+                <div class="pipeline-content">
+                    <h4 style="color: var(--accent-cyan);">Step 3 — Deepgram STT Initialization</h4>
+                    <p>The backend creates an <code>AICallOrchestrator</code> which establishes a live WebSocket connection to Deepgram's Nova-2 model. Configuration: <code>language=hi</code> (Hindi/Hinglish), <code>16kHz linear16</code> encoding, VAD + smart formatting enabled.</p>
+                </div>
+            </div>
+            <div class="pipeline-step">
+                <div class="pipeline-line">
+                    <div class="pipeline-dot" style="border-color: var(--accent-green);"></div>
+                    <div class="pipeline-connector"></div>
+                </div>
+                <div class="pipeline-content">
+                    <h4 style="color: var(--accent-green);">Step 4 — AI Welcome Greeting</h4>
+                    <p>After a 1.5s delay for the call line to settle, the AI generates a personalized intro greeting using the active <code>VoiceAgent</code>'s <code>first_message</code> template (with <code>{lead_name}</code> and <code>{city}</code> placeholders). ElevenLabs converts this to speech and sends the audio bytes back through the WebSocket.</p>
+                </div>
+            </div>
+            <div class="pipeline-step">
+                <div class="pipeline-line">
+                    <div class="pipeline-dot" style="border-color: var(--accent-orange);"></div>
+                    <div class="pipeline-connector"></div>
+                </div>
+                <div class="pipeline-content">
+                    <h4 style="color: var(--accent-orange);">Step 5 — Real-Time Conversation Loop</h4>
+                    <p>Audio bytes stream continuously from the phone → Flutter → Backend → Deepgram. When Deepgram returns a final transcript, the AI engine fires: <strong>Save message → Gemini AI (CRM extract + reply) → Update Lead → ElevenLabs TTS → Send audio back</strong>. This loop repeats for every customer utterance.</p>
+                </div>
+            </div>
+            <div class="pipeline-step">
+                <div class="pipeline-line">
+                    <div class="pipeline-dot" style="border-color: var(--accent-pink);"></div>
+                    <div class="pipeline-connector"></div>
+                </div>
+                <div class="pipeline-content">
+                    <h4 style="color: var(--accent-pink);">Step 6 — Call Completion</h4>
+                    <p>When the WebSocket disconnects (call ends), the orchestrator closes the Deepgram stream, compiles all audio chunks into a WAV file, uploads to AWS S3, updates the Call record with the final transcript + recording URL, and broadcasts <code>CALL_ENDED</code> to all clients.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SECTION 5 ==================== -->
+    <div class="section page-break">
+        <div class="section-number">Section 05</div>
+        <h1>Backend Architecture & API Design</h1>
+        <p class="lead-text">The backend follows a clean layered architecture: <strong>API Routes → Services → CRUD → Models</strong>. All routes are registered in <code>main.py</code> and organized by domain.</p>
+
+        <div class="mermaid-container">
+            <div class="mermaid-title">🏛️ Backend Layered Architecture</div>
+            <div class="mermaid">
+graph TD
+    API["📡 API Layer — FastAPI Routers
+    auth · leads · calls · properties
+    realtime_call · voice_agent · ai_training
+    dashboard · salesforce · campaigns"] 
+    
+    API -->|"Request"| SERVICES
+    
+    SERVICES["⚙️ Service Layer — Business Logic
+    ai_service · call_dispatcher · call_orchestrator
+    salesforce_service · conversation_service
+    device_connection_manager · tts_service"]
+    
+    SERVICES -->|"Query"| CRUD
+    SERVICES -->|"API Call"| INTEGRATIONS
+    
+    CRUD["💾 CRUD Layer — Data Access
+    user · lead · call · property
+    conversation · ai_training_data · voice_agent"]
+    
+    INTEGRATIONS["🔌 External Integrations
+    Gemini · Deepgram · ElevenLabs
+    AWS S3 · Salesforce"]
+    
+    CRUD --> DB[("🗄️ PostgreSQL + pgvector")]
+    INTEGRATIONS --> EXT["🌐 External APIs"]
+
+    style API fill:#1e1b4b,stroke:#3b82f6,color:#fff
+    style SERVICES fill:#1e293b,stroke:#8b5cf6,color:#fff
+    style CRUD fill:#1a2332,stroke:#06b6d4,color:#fff
+    style INTEGRATIONS fill:#2e1a1a,stroke:#f97316,color:#fff
+    style DB fill:#1a2e1a,stroke:#10b981,color:#fff
+    style EXT fill:#2e1a2e,stroke:#ec4899,color:#fff
+            </div>
+        </div>
+
+        <h2>Complete API Endpoints</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Endpoint</th>
+                    <th>Method</th>
+                    <th>Description</th>
+                    <th>Module</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>/auth/login</td><td>POST</td><td>OAuth2 JWT login (email + password)</td><td>auth.py</td></tr>
+                <tr><td>/auth/me</td><td>GET</td><td>Get current authenticated user</td><td>auth.py</td></tr>
+                <tr><td>/auth/me</td><td>PUT</td><td>Update user profile</td><td>auth.py</td></tr>
+                <tr><td>/auth/me/password</td><td>PUT</td><td>Update user password</td><td>auth.py</td></tr>
+                <tr><td>/properties</td><td>GET/POST</td><td>CRUD for real estate properties</td><td>properties.py</td></tr>
+                <tr><td>/leads</td><td>GET/POST</td><td>CRUD for customer leads</td><td>leads.py</td></tr>
+                <tr><td>/calls</td><td>GET/POST</td><td>Call session management</td><td>calls.py</td></tr>
+                <tr><td>/conversations</td><td>GET</td><td>Get call conversation history</td><td>conversations.py</td></tr>
+                <tr><td>/ai/chat</td><td>POST</td><td>Send message to AI engine</td><td>ai.py</td></tr>
+                <tr><td>/realtime/call/{id}</td><td>WS</td><td>WebSocket for live AI voice call</td><td>realtime_call.py</td></tr>
+                <tr><td>/voice-agents</td><td>GET/POST</td><td>Manage AI voice agents & prompts</td><td>voice_agent.py</td></tr>
+                <tr><td>/ai-training</td><td>GET/POST</td><td>AI knowledge base entries</td><td>ai_training.py</td></tr>
+                <tr><td>/ai-training/stats</td><td>GET</td><td>Training data usage statistics</td><td>ai_training.py</td></tr>
+                <tr><td>/campaigns</td><td>GET/POST</td><td>Campaign management</td><td>campaigns.py</td></tr>
+                <tr><td>/devices</td><td>GET/POST</td><td>Device registration & management</td><td>devices.py</td></tr>
+                <tr><td>/device-socket/{id}</td><td>WS</td><td>Device WebSocket connection</td><td>device_socket.py</td></tr>
+                <tr><td>/dashboard</td><td>GET</td><td>Dashboard analytics data</td><td>dashboard.py</td></tr>
+                <tr><td>/analytics</td><td>GET</td><td>Advanced analytics & charts</td><td>analytics.py</td></tr>
+                <tr><td>/salesforce/sync</td><td>POST</td><td>Sync leads from Salesforce CRM</td><td>salesforce.py</td></tr>
+                <tr><td>/api/v1/salesforce-knowledge/sync</td><td>POST</td><td>Sync knowledge articles for RAG</td><td>salesforce_knowledge.py</td></tr>
+                <tr><td>/logs</td><td>GET</td><td>Application log viewer</td><td>logs.py</td></tr>
+                <tr><td>/users</td><td>GET/POST</td><td>User management</td><td>users.py</td></tr>
+                <tr><td>/roles</td><td>GET/POST</td><td>Role & permission management</td><td>roles.py</td></tr>
+                <tr><td>/super-admin</td><td>Various</td><td>Super admin tenant management</td><td>super_admin.py</td></tr>
+                <tr><td>/speech</td><td>POST</td><td>Text-to-speech conversion</td><td>speech.py</td></tr>
+                <tr><td>/voice</td><td>Various</td><td>Voice streaming endpoints</td><td>voice.py</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ==================== SECTION 6 ==================== -->
+    <div class="section page-break">
+        <div class="section-number">Section 06</div>
+        <h1>Database Schema & Data Models</h1>
+        <p class="lead-text">The database uses PostgreSQL 15 with the pgvector extension for AI embedding storage. All models use UUID primary keys and include <code>created_at</code>/<code>updated_at</code> timestamps via a shared <code>TimestampMixin</code>.</p>
+
+        <div class="mermaid-container">
+            <div class="mermaid-title">📊 Entity Relationship Diagram</div>
+            <div class="mermaid">
+erDiagram
+    TENANT ||--o{ USER : has
+    TENANT ||--o{ ROLE : has
+    TENANT ||--o{ PROPERTY : has
+    TENANT ||--o{ LEAD : has
+    TENANT ||--o{ CALL : has
+
+    ROLE ||--o{ USER : assigned_to
+    USER ||--o{ LEAD : assigned_to
+    USER ||--o{ PROPERTY : assigned_to
+
+    LEAD ||--o{ CALL : has
+    CALL ||--o{ CONVERSATION : has
+    CAMPAIGN ||--o{ LEAD : contains
+    CAMPAIGN ||--o{ CALL : contains
+    CAMPAIGN }o--|| VOICE_AGENT : uses
+
+    KNOWLEDGE_DOCUMENT ||--o{ DOCUMENT_CHUNK : has
+
+    TENANT {
+        uuid id PK
+        string name
+        boolean is_active
+    }
+
+    USER {
+        uuid id PK
+        string first_name
+        string last_name
+        string email
+        string phone
+        string password_hash
+        uuid role_id FK
+        uuid tenant_id FK
+        boolean is_superadmin
+        string otp_code
+    }
+
+    ROLE {
+        uuid id PK
+        string name
+        text description
+        jsonb permissions
+        uuid tenant_id FK
+    }
+
+    PROPERTY {
+        uuid id PK
+        string title
+        text description
+        enum property_type
+        enum listing_type
+        string city
+        string locality
+        decimal price
+        int bedrooms
+        int area_sqft
+        enum furnishing
+        uuid tenant_id FK
+    }
+
+    LEAD {
+        uuid id PK
+        string first_name
+        string phone
+        string preferred_city
+        decimal budget_max
+        int bedrooms
+        enum status
+        enum priority
+        enum source
+        text conversation_summary
+        uuid tenant_id FK
+        uuid campaign_id FK
+    }
+
+    CALL {
+        uuid id PK
+        uuid lead_id FK
+        enum direction
+        enum status
+        datetime start_time
+        datetime end_time
+        string recording_url
+        text transcript
+        text summary
+        enum outcome
+        uuid campaign_id FK
+    }
+
+    CONVERSATION {
+        uuid id PK
+        uuid call_id FK
+        enum sender
+        text message
+        enum intent
+    }
+
+    VOICE_AGENT {
+        uuid id PK
+        string name
+        string provider
+        string voice_id
+        text prompt
+        text first_message
+        boolean is_active
+    }
+
+    CAMPAIGN {
+        uuid id PK
+        string name
+        string status
+        int total_leads
+        int calls_completed
+        uuid voice_agent_id FK
+    }
+
+    AI_TRAINING_DATA {
+        uuid id PK
+        string title
+        enum category
+        string trigger_phrase
+        text situation_context
+        text ideal_response
+        int priority
+        int usage_count
+        boolean is_active
+    }
+
+    KNOWLEDGE_DOCUMENT {
+        string id PK
+        string title
+        string document_type
+    }
+
+    DOCUMENT_CHUNK {
+        int id PK
+        string document_id FK
+        text chunk_text
+        vector embedding
+    }
+            </div>
+        </div>
+
+        <h2>Key Enumerations</h2>
+        <div class="grid-2">
+            <div class="card">
+                <h4>Lead Status</h4>
+                <div class="tech-badge-group">
+                    <span class="tech-badge green">NEW</span>
+                    <span class="tech-badge">CONTACTED</span>
+                    <span class="tech-badge cyan">INTERESTED</span>
+                    <span class="tech-badge orange">NOT_INTERESTED</span>
+                    <span class="tech-badge purple">FOLLOW_UP</span>
+                    <span class="tech-badge pink">CONVERTED</span>
+                </div>
+            </div>
+            <div class="card">
+                <h4>Call Status</h4>
+                <div class="tech-badge-group">
+                    <span class="tech-badge">scheduled</span>
+                    <span class="tech-badge cyan">in_progress</span>
+                    <span class="tech-badge green">completed</span>
+                    <span class="tech-badge orange">failed</span>
+                    <span class="tech-badge purple">missed</span>
+                    <span class="tech-badge pink">rejected</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SECTION 7 ==================== -->
+    <div class="section page-break">
+        <div class="section-number">Section 07</div>
+        <h1>Frontend Web Dashboard</h1>
+        <p class="lead-text">The React web dashboard is the primary admin/supervisor interface. It provides a complete CRM, call management, analytics, and real-time monitoring experience.</p>
+
+        <div class="mermaid-container">
+            <div class="mermaid-title">🖥️ Frontend Page Structure & Routing</div>
+            <div class="mermaid">
+graph TD
+    LOGIN["/login — Login Page"] --> AUTH_CHECK{"Authenticated?"}
+    AUTH_CHECK -->|"No"| LOGIN
+    AUTH_CHECK -->|"Yes"| LAYOUT["Protected Layout with Sidebar"]
+
+    LAYOUT --> CRM_GROUP
+    LAYOUT --> CALL_GROUP
+    LAYOUT --> AI_GROUP
+    LAYOUT --> ADMIN_GROUP
+
+    subgraph CRM_GROUP["📊 CRM & Data"]
+        DASH["/ Dashboard"]
+        PROPS["/properties"]
+        LEADS["/leads"]
+    end
+
+    subgraph CALL_GROUP["📞 Calling & Devices"]
+        CALLS["/calls"]
+        CAMP["/campaigns"]
+        DEV["/devices"]
+        WEBRTC["/webrtc"]
+    end
+
+    subgraph AI_GROUP["🤖 AI & Agents"]
+        VA["/voice-agents"]
+        AIT["/ai-training"]
+    end
+
+    subgraph ADMIN_GROUP["⚙️ Administration"]
+        SET["/settings"]
+        LOGS["/logs"]
+        PROF["/profile"]
+        AGEN["/agency"]
+    end
+
+    style LOGIN fill:#1e1b4b,stroke:#3b82f6,color:#fff
+    style LAYOUT fill:#1e293b,stroke:#8b5cf6,color:#fff
+    style CRM_GROUP fill:#0f172a,stroke:#3b82f6,color:#fff
+    style CALL_GROUP fill:#0f172a,stroke:#06b6d4,color:#fff
+    style AI_GROUP fill:#0f172a,stroke:#8b5cf6,color:#fff
+    style ADMIN_GROUP fill:#0f172a,stroke:#f97316,color:#fff
+            </div>
+        </div>
+
+        <h2>Key Pages & Features</h2>
+        <div class="grid-2">
+            <div class="card">
+                <h4>📊 Dashboard</h4>
+                <p class="card-desc">Real-time KPIs (total leads, calls today, conversion rate), activity charts via Recharts, recent call activity feed, and call outcome breakdown.</p>
+            </div>
+            <div class="card">
+                <h4>👥 Leads Management</h4>
+                <p class="card-desc">Full CRUD with filtering by status/priority/source. Inline Salesforce sync button. Shows AI-extracted conversation summaries. Links to call history per lead.</p>
+            </div>
+            <div class="card">
+                <h4>📞 Calls</h4>
+                <p class="card-desc">View all call sessions with status, duration, transcript preview, and recording playback. Shows real-time call status updates via WebSocket.</p>
+            </div>
+            <div class="card">
+                <h4>🤖 Voice Agents</h4>
+                <p class="card-desc">Configure AI agent personality, system prompt, first greeting message, voice provider, language, and interruptibility settings. Only one agent can be active at a time.</p>
+            </div>
+            <div class="card">
+                <h4>🧠 AI Training</h4>
+                <p class="card-desc">Manage the AI knowledge base. Add objection handling scripts, FAQ responses, property pitches, and compliance guidelines that get injected into AI prompts during calls.</p>
+            </div>
+            <div class="card">
+                <h4>📱 Devices</h4>
+                <p class="card-desc">Monitor connected Android gateway devices. Shows device status (ONLINE/OFFLINE/BUSY), device ID, and last seen timestamp.</p>
+            </div>
+            <div class="card">
+                <h4>🏠 Properties</h4>
+                <p class="card-desc">Full property management with title, type, location, pricing, bedrooms, area, amenities, and owner details. Properties are used by the AI for recommendations.</p>
+            </div>
+            <div class="card">
+                <h4>⚙️ Settings (RBAC)</h4>
+                <p class="card-desc">Dynamic role management with granular permissions (view_dashboard, manage_leads, manage_calls, manage_agents, etc.). Roles have JSONB permission arrays.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SECTION 8 ==================== -->
+    <div class="section page-break">
+        <div class="section-number">Section 08</div>
+        <h1>Flutter Mobile Application</h1>
+        <p class="lead-text">The Flutter app serves as the <strong>telephony gateway</strong> — the bridge between the AI backend and the actual phone network. It receives call assignments, places phone calls, and streams audio bidirectionally.</p>
+
+        <div class="mermaid-container">
+            <div class="mermaid-title">📱 Flutter App Feature Modules</div>
+            <div class="mermaid">
+graph TD
+    MAIN["main.dart<br/>(Entry Point)"] --> APP["AIVoiceCallingApp<br/>(Material App)"]
+    APP --> NAV["GoRouter Navigation"]
+
+    NAV --> SPLASH["Splash Screen"]
+    NAV --> AUTH["Auth / Login"]
+    NAV --> DASH["Dashboard"]
+    NAV --> CALLS["Call Management"]
+    NAV --> AI["AI Conversation View"]
+    NAV --> TRANS["Live Transcripts"]
+    NAV --> SUP["Supervisor Console"]
+    NAV --> SCRIPTS["Call Scripts"]
+    NAV --> ANALYTICS["Analytics"]
+    NAV --> LOGS["Logs Viewer"]
+    NAV --> SETTINGS["Settings"]
+
+    CALLS --> REALTIME["Realtime Audio Service<br/>(WebSocket Audio Streaming)"]
+    CALLS --> WEBRTC["WebRTC Voice Service<br/>(LiveKit Client)"]
+    CALLS --> NATIVE["Native Phone Service<br/>(Android Dialer)"]
+    CALLS --> STATE["Call State Service<br/>(State Management)"]
+
+    REALTIME --> BACKEND["Backend<br/>/realtime/call/{id}"]
+    WEBRTC --> LIVEKIT["LiveKit Server"]
+
+    MAIN --> DEVICE["Device Service<br/>(Device Registration)"]
+    DEVICE --> WS["WebSocket Connection<br/>to Backend"]
+
+    style MAIN fill:#1e1b4b,stroke:#06b6d4,color:#fff
+    style CALLS fill:#1e293b,stroke:#8b5cf6,color:#fff
+    style REALTIME fill:#1a2332,stroke:#3b82f6,color:#fff
+            </div>
+        </div>
+
+        <h3>Key Flutter Services</h3>
+        <div class="grid-2">
+            <div class="card">
+                <h4>🔌 Device Service</h4>
+                <p class="card-desc">Registers the Android device with the backend on app startup. Sends device info (model, OS version, unique ID) and maintains a persistent WebSocket connection to receive call assignments.</p>
+            </div>
+            <div class="card">
+                <h4>🎵 Realtime Audio Service</h4>
+                <p class="card-desc">Manages the bidirectional audio stream between the phone's microphone/speaker and the backend WebSocket. Sends raw PCM audio chunks and receives AI voice audio for playback.</p>
+            </div>
+            <div class="card">
+                <h4>📞 Call State Service</h4>
+                <p class="card-desc">Manages the state machine for call lifecycle (IDLE → RINGING → ACTIVE → ENDED). Listens for incoming assignments and coordinates with Native Phone Service and Audio Service.</p>
+            </div>
+            <div class="card">
+                <h4>🌐 WebRTC Voice Service</h4>
+                <p class="card-desc">Alternative audio transport using LiveKit WebRTC for low-latency audio streaming. Provides better audio quality and reduced latency compared to raw WebSocket audio.</p>
+            </div>
+        </div>
+
+        <h3>State Management</h3>
+        <p>The app uses <strong>Flutter Riverpod</strong> for state management and <strong>GoRouter</strong> for declarative routing. HTTP communication uses the <strong>Dio</strong> client with interceptors for JWT token injection.</p>
+    </div>
+
+    <!-- ==================== SECTION 9 ==================== -->
+    <div class="section page-break">
+        <div class="section-number">Section 09</div>
+        <h1>Salesforce CRM Integration & RAG Pipeline</h1>
+        <p class="lead-text">NexaVoice integrates deeply with Salesforce, both for <strong>lead synchronization</strong> and for a <strong>Retrieval-Augmented Generation (RAG)</strong> pipeline that feeds verified knowledge into the AI during live calls.</p>
+
+        <div class="mermaid-container">
+            <div class="mermaid-title">🔗 Salesforce Integration & RAG Architecture</div>
+            <div class="mermaid">
+flowchart LR
+    subgraph SF["Salesforce CRM"]
+        SFL["Lead Objects<br/>(SOQL Query)"]
+        SFK["Knowledge Articles<br/>(KnowledgeArticleVersion)"]
+    end
+
+    subgraph SYNC["Sync Pipeline"]
+        AUTH_SF["OAuth 2.0<br/>Username-Password Flow"]
+        FETCH_L["Fetch Leads<br/>(REST API v60)"]
+        FETCH_K["Fetch Knowledge<br/>Articles"]
+    end
+
+    subgraph RAG["RAG Pipeline"]
+        CHUNK["LangChain<br/>Text Splitter<br/>(500 char chunks)"]
+        EMBED["Gemini<br/>text-embedding-004<br/>(768 dimensions)"]
+        STORE["pgvector<br/>Vector Storage"]
+    end
+
+    subgraph QUERY["Live Call Query"]
+        MSG["Customer Message"]
+        Q_EMB["Generate Query<br/>Embedding"]
+        COS["Cosine Similarity<br/>Search (Top 3)"]
+        INJECT["Inject into<br/>Gemini Prompt"]
+    end
+
+    SF --> AUTH_SF
+    AUTH_SF --> FETCH_L
+    AUTH_SF --> FETCH_K
+    FETCH_L --> PG[("PostgreSQL<br/>leads table")]
+    FETCH_K --> CHUNK
+    CHUNK --> EMBED
+    EMBED --> STORE
+
+    MSG --> Q_EMB
+    Q_EMB --> COS
+    STORE --> COS
+    COS --> INJECT
+    INJECT --> GEMINI["🧠 Gemini AI<br/>Response"]
+
+    style SF fill:#1e1b4b,stroke:#3b82f6,color:#fff
+    style RAG fill:#1e293b,stroke:#8b5cf6,color:#fff
+    style QUERY fill:#1a2332,stroke:#06b6d4,color:#fff
+            </div>
+        </div>
+
+        <div class="callout info">
+            <div class="callout-title">💡 Mock Sandbox Mode</div>
+            <div class="callout-text">When Salesforce credentials are not configured, the system automatically falls back to a "Developer Sandbox" mode with realistic mock data. This allows testing the full integration pipeline without a live Salesforce org.</div>
+        </div>
+
+        <h3>How RAG Works During a Call</h3>
+        <ol>
+            <li><strong>Customer speaks</strong> — e.g., "What amenities does Skyline Towers have?"</li>
+            <li><strong>Deepgram transcribes</strong> the speech to text</li>
+            <li>The text is <strong>embedded</strong> into a 768-dimension vector using <code>text-embedding-004</code></li>
+            <li>A <strong>cosine similarity search</strong> against <code>document_chunks</code> finds the top 3 most relevant knowledge snippets</li>
+            <li>These snippets are <strong>injected into the Gemini prompt</strong> as "Verified Ground Truth Facts from Salesforce"</li>
+            <li>Gemini uses these facts to generate an <strong>accurate, grounded response</strong> instead of hallucinating</li>
+        </ol>
+    </div>
+
+    <!-- ==================== SECTION 10 ==================== -->
+    <div class="section page-break">
+        <div class="section-number">Section 10</div>
+        <h1>AI Training & Knowledge Base System</h1>
+        <p class="lead-text">The AI Training system allows administrators to inject domain-specific knowledge, objection handling scripts, and compliance guidelines directly into the AI engine — without retraining any model.</p>
+
+        <div class="mermaid-container">
+            <div class="mermaid-title">🧠 Dynamic AI Training Injection</div>
+            <div class="mermaid">
+flowchart TD
+    ADMIN["Admin creates<br/>Training Entry"] --> DB["Stored in<br/>ai_training_data table"]
+    
+    CALL_START["Live Call Starts"] --> MSG["Customer says<br/>something"]
+    MSG --> KEYWORD["Keyword Extraction<br/>from customer message"]
+    KEYWORD --> MATCH["Match against<br/>trigger_phrases"]
+    DB --> MATCH
+    MATCH --> INJECT["Inject matching entries<br/>into Gemini prompt"]
+    INJECT --> GEMINI["Gemini AI generates<br/>response using training"]
+    GEMINI --> TRACK["Increment usage_count<br/>for used entries"]
+
+    style ADMIN fill:#1e1b4b,stroke:#3b82f6,color:#fff
+    style GEMINI fill:#1e293b,stroke:#8b5cf6,color:#fff
+            </div>
+        </div>
+
+        <h3>Training Categories</h3>
+        <div class="grid-3">
+            <div class="card">
+                <h4>🚫 Objection Handling</h4>
+                <p class="card-desc">Responses for "not interested", "too expensive", "call later", etc.</p>
+            </div>
+            <div class="card">
+                <h4>❓ FAQ</h4>
+                <p class="card-desc">Common questions about RERA, loans, EMI, possession dates, etc.</p>
+            </div>
+            <div class="card">
+                <h4>🏠 Property Pitch</h4>
+                <p class="card-desc">Scripts for pitching specific properties with features and pricing.</p>
+            </div>
+            <div class="card">
+                <h4>📞 Call Script</h4>
+                <p class="card-desc">Opening greetings, closing scripts, and call flow templates.</p>
+            </div>
+            <div class="card">
+                <h4>⚖️ Compliance</h4>
+                <p class="card-desc">Legal disclaimers, RERA registration info, and regulatory compliance.</p>
+            </div>
+            <div class="card">
+                <h4>📊 Product Knowledge</h4>
+                <p class="card-desc">Detailed project specs, amenity lists, and builder information.</p>
+            </div>
+        </div>
+
+        <div class="callout success">
+            <div class="callout-title">✅ Dynamic "Training" Without ML</div>
+            <div class="callout-text">This system achieves training-like behavior through <strong>prompt engineering</strong>. Training entries are injected into the Gemini system prompt at call-time based on keyword matching. This means changes take effect immediately — no model retraining, no downtime, no GPU costs.</div>
+        </div>
+    </div>
+
+    <!-- ==================== SECTION 11 ==================== -->
+    <div class="section page-break">
+        <div class="section-number">Section 11</div>
+        <h1>Authentication & Multi-Tenancy</h1>
+
+        <h2>Authentication Flow</h2>
+        <div class="mermaid-container">
+            <div class="mermaid-title">🔐 JWT Authentication Flow</div>
+            <div class="mermaid">
+sequenceDiagram
+    participant U as User/Client
+    participant API as FastAPI Backend
+    participant DB as PostgreSQL
+
+    U->>API: POST /auth/login (email, password)
+    API->>DB: Query user by email
+    DB-->>API: User record + password_hash
+    API->>API: bcrypt.verify(password, hash)
+    alt Invalid credentials
+        API-->>U: 401 Unauthorized
+    else Valid credentials
+        API->>API: Generate JWT (sub=user_id, exp=60min)
+        API-->>U: {access_token, user, role, permissions}
+    end
+
+    U->>API: GET /auth/me (Authorization: Bearer token)
+    API->>API: Decode JWT, extract user_id
+    API->>DB: Fetch user + role + permissions
+    API->>API: set_current_tenant_id(user.tenant_id)
+    API-->>U: User profile with role & permissions
+            </div>
+        </div>
+
+        <h2>Role-Based Access Control (RBAC)</h2>
+        <p>The system uses a dynamic RBAC model where <strong>Roles</strong> have a <code>JSONB permissions</code> array. Each route can require specific permissions using the <code>RequirePermissions</code> dependency.</p>
+
+        <h3>Default Permission Set</h3>
+        <div class="tech-badge-group">
+            <span class="tech-badge">view_dashboard</span>
+            <span class="tech-badge purple">manage_properties</span>
+            <span class="tech-badge green">manage_leads</span>
+            <span class="tech-badge cyan">manage_calls</span>
+            <span class="tech-badge orange">manage_agents</span>
+            <span class="tech-badge pink">manage_devices</span>
+            <span class="tech-badge">view_logs</span>
+            <span class="tech-badge purple">manage_roles</span>
+        </div>
+
+        <h2>Multi-Tenancy</h2>
+        <p>The platform supports multi-tenancy at the database level. Each major entity (User, Lead, Property, Call, Role) has a <code>tenant_id</code> foreign key. The <code>set_current_tenant_id()</code> function is called after JWT validation to scope all subsequent database queries to the authenticated user's tenant.</p>
+    </div>
+
+    <!-- ==================== SECTION 12 ==================== -->
+    <div class="section page-break">
+        <div class="section-number">Section 12</div>
+        <h1>Deployment Architecture</h1>
+        <p class="lead-text">The application is containerized using Docker Compose with 4 services.</p>
+
+        <div class="mermaid-container">
+            <div class="mermaid-title">🐳 Docker Compose Architecture</div>
+            <div class="mermaid">
+graph TB
+    subgraph DOCKER["Docker Compose"]
+        NGINX["🌐 Nginx<br/>Port 80/443<br/>Reverse Proxy + SSL"]
+        BACK["⚙️ FastAPI Backend<br/>Port 8000<br/>Python 3.11-slim"]
+        DB_C["🗄️ PostgreSQL 15<br/>Port 5432<br/>pgvector/pgvector:pg15"]
+        CERT["🔒 Certbot<br/>Let's Encrypt<br/>Auto-renewal"]
+    end
+
+    INTERNET["🌍 Internet"] --> NGINX
+    NGINX -->|"Proxy /api/*"| BACK
+    NGINX -->|"Serve /static"| STATIC["📁 Frontend<br/>dist/ build"]
+    BACK --> DB_C
+    CERT --> NGINX
+
+    subgraph VOLUMES["📦 Volumes"]
+        V1["postgres_data"]
+        V2["certbot/conf"]
+        V3["frontend/dist"]
+    end
+
+    DB_C --> V1
+    CERT --> V2
+    STATIC --> V3
+
+    style DOCKER fill:#1e293b,stroke:#3b82f6,color:#fff
+    style INTERNET fill:#1e1b4b,stroke:#8b5cf6,color:#fff
+            </div>
+        </div>
+
+        <h2>Docker Services</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Service</th>
+                    <th>Image</th>
+                    <th>Port</th>
+                    <th>Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>backend</td><td>Custom (Python 3.11-slim)</td><td>8000</td><td>FastAPI application server</td></tr>
+                <tr><td>db</td><td>pgvector/pgvector:pg15</td><td>5432</td><td>PostgreSQL with vector extension</td></tr>
+                <tr><td>nginx</td><td>nginx:latest</td><td>80, 443</td><td>Reverse proxy, SSL, static files</td></tr>
+                <tr><td>certbot</td><td>certbot/certbot</td><td>—</td><td>Auto-renew Let's Encrypt SSL certs</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ==================== SECTION 13 ==================== -->
+    <div class="section page-break">
+        <div class="section-number">Section 13</div>
+        <h1>API Costing Analysis</h1>
+        <p class="lead-text">Monthly cost projection at scale: <strong>1,000 calls/day</strong>, 4 minutes average duration, 30,000 calls/month.</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Service</th>
+                    <th>Function</th>
+                    <th>Monthly Cost (USD)</th>
+                    <th>Monthly Cost (INR)</th>
+                    <th>% of Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>ElevenLabs</td>
+                    <td>Voice Generation (TTS)</td>
+                    <td style="font-weight: 700; color: var(--accent-red);">$8,100.00</td>
+                    <td>₹6,72,000</td>
+                    <td>75.1%</td>
+                </tr>
+                <tr>
+                    <td>Tata Smartflo</td>
+                    <td>Phone Network (SIP)</td>
+                    <td style="font-weight: 700; color: var(--accent-orange);">$2,160.00</td>
+                    <td>₹1,80,000</td>
+                    <td>20.0%</td>
+                </tr>
+                <tr>
+                    <td>Deepgram</td>
+                    <td>Speech Transcription</td>
+                    <td style="font-weight: 700;">$516.00</td>
+                    <td>₹42,800</td>
+                    <td>4.8%</td>
+                </tr>
+                <tr>
+                    <td>Google Gemini</td>
+                    <td>AI Brain (LLM)</td>
+                    <td style="font-weight: 700; color: var(--accent-green);">$15.75</td>
+                    <td>₹1,300</td>
+                    <td>0.1%</td>
+                </tr>
+                <tr>
+                    <td>AWS S3</td>
+                    <td>Call Recording Storage</td>
+                    <td style="font-weight: 700; color: var(--accent-green);">$0.69</td>
+                    <td>₹57</td>
+                    <td>&lt;0.1%</td>
+                </tr>
+                <tr style="background: rgba(59,130,246,0.08);">
+                    <td style="color: var(--accent-blue); font-weight: 800;">TOTAL</td>
+                    <td></td>
+                    <td style="color: var(--accent-blue); font-weight: 800;">$10,792.44</td>
+                    <td style="color: var(--accent-blue); font-weight: 800;">≈ ₹8,96,157</td>
+                    <td style="font-weight: 800;">100%</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="callout warning">
+            <div class="callout-title">⚠️ Cost Optimization Recommendation</div>
+            <div class="callout-text">ElevenLabs accounts for <strong>75%</strong> of total infrastructure cost. If scaling beyond 1,000 calls/day, consider migrating TTS to <strong>Deepgram Aura</strong> or <strong>Amazon Polly</strong>, which would reduce the TTS cost from $8,100 to roughly $1,800/month — a <strong>78% savings</strong>.</div>
+        </div>
+    </div>
+
+    <!-- ==================== SECTION 14 ==================== -->
+    <div class="section page-break">
+        <div class="section-number">Section 14</div>
+        <h1>Project Directory Structure</h1>
+
+        <div class="grid-2">
+            <div class="card">
+                <h4>📁 Backend (<code>backend/</code>)</h4>
+                <pre style="color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.5; white-space: pre;">
+backend/
+├── app/
+│   ├── main.py              # FastAPI entry point
+│   ├── api/                  # Route handlers (25+)
+│   │   ├── auth.py
+│   │   ├── leads.py
+│   │   ├── calls.py
+│   │   ├── properties.py
+│   │   ├── realtime_call.py  # WebSocket voice call
+│   │   ├── voice_agent.py
+│   │   ├── ai_training.py
+│   │   ├── salesforce.py
+│   │   ├── salesforce_knowledge.py
+│   │   ├── dashboard.py
+│   │   ├── analytics.py
+│   │   └── ...
+│   ├── core/
+│   │   ├── config.py         # Pydantic Settings
+│   │   ├── dependencies.py   # Auth + RBAC
+│   │   └── security.py       # Password hashing
+│   ├── crud/                 # Data access layer
+│   ├── models/               # SQLAlchemy models
+│   ├── schemas/              # Pydantic schemas
+│   ├── services/             # Business logic
+│   │   ├── ai_service.py     # Gemini AI engine
+│   │   ├── call_orchestrator.py
+│   │   ├── call_dispatcher.py
+│   │   ├── salesforce_service.py
+│   │   └── ...
+│   ├── integrations/         # External APIs
+│   │   ├── gemini/
+│   │   ├── deepgram/
+│   │   ├── elevenlabs/
+│   │   ├── aws/
+│   │   └── salesforce/
+│   └── database/
+│       ├── session.py
+│       └── base.py
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+└── alembic/                  # DB migrations</pre>
+            </div>
+            <div class="card">
+                <h4>📁 Frontend (<code>frontend/</code>)</h4>
+                <pre style="color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.5; white-space: pre;">
+frontend/
+├── src/
+│   ├── App.jsx               # Root + Routing
+│   ├── main.jsx              # React entry
+│   ├── api.js                # Axios config
+│   ├── pages/
+│   │   ├── Dashboard.jsx
+│   │   ├── Properties.jsx
+│   │   ├── Leads.jsx
+│   │   ├── Calls.jsx
+│   │   ├── VoiceAgents.jsx
+│   │   ├── Devices.jsx
+│   │   ├── Campaigns.jsx
+│   │   ├── AITraining.jsx
+│   │   ├── WebRTC.jsx
+│   │   ├── Settings.jsx
+│   │   ├── Login.jsx
+│   │   ├── Profile.jsx
+│   │   ├── Agency.jsx
+│   │   └── Logs.jsx
+│   ├── components/
+│   │   ├── Sidebar.jsx
+│   │   ├── Modal.jsx
+│   │   ├── PermissionGuard.jsx
+│   │   ├── WelcomeBanner.jsx
+│   │   └── EmptyState.jsx
+│   ├── context/
+│   │   └── AuthContext.jsx
+│   └── utils/
+├── package.json
+├── vite.config.js
+└── tailwind.config.js
+
+📁 Flutter App (ai_voice_calling/)
+├── lib/
+│   ├── main.dart
+│   ├── app/                  # App shell
+│   ├── core/                 # Device, Logger
+│   ├── features/             # Feature modules
+│   │   ├── auth/
+│   │   ├── calls/
+│   │   ├── dashboard/
+│   │   ├── supervisor/
+│   │   ├── transcripts/
+│   │   ├── ai/
+│   │   └── ...
+│   ├── services/
+│   │   ├── realtime_audio_service.dart
+│   │   ├── webrtc_voice_service.dart
+│   │   ├── call_state_service.dart
+│   │   └── native_phone_service.dart
+│   └── shared/
+└── pubspec.yaml</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SUMMARY SECTION ==================== -->
+    <div class="section page-break">
+        <div class="section-number">Summary</div>
+        <h1>Technology Stack Summary</h1>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Layer</th>
+                    <th>Technology</th>
+                    <th>Version</th>
+                    <th>Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Backend Framework</td><td>FastAPI + Uvicorn</td><td>0.128</td><td>Async REST API + WebSocket server</td></tr>
+                <tr><td>Language (Backend)</td><td>Python</td><td>3.11</td><td>Primary backend language</td></tr>
+                <tr><td>Database</td><td>PostgreSQL + pgvector</td><td>15</td><td>Relational DB + vector search</td></tr>
+                <tr><td>ORM</td><td>SQLAlchemy + Alembic</td><td>2.0</td><td>ORM + schema migrations</td></tr>
+                <tr><td>Validation</td><td>Pydantic</td><td>v2</td><td>Request/response schemas</td></tr>
+                <tr><td>Auth</td><td>python-jose + bcrypt</td><td>—</td><td>JWT + password hashing</td></tr>
+                <tr><td>Frontend Framework</td><td>React</td><td>19</td><td>SPA web dashboard</td></tr>
+                <tr><td>Build Tool</td><td>Vite</td><td>8</td><td>Dev server + production builds</td></tr>
+                <tr><td>CSS Framework</td><td>TailwindCSS</td><td>3.4</td><td>Utility-first CSS</td></tr>
+                <tr><td>Charts</td><td>Recharts</td><td>3.10</td><td>Analytics visualizations</td></tr>
+                <tr><td>Animations</td><td>Framer Motion</td><td>13</td><td>UI animations</td></tr>
+                <tr><td>Mobile Framework</td><td>Flutter (Dart)</td><td>3.9</td><td>Cross-platform mobile app</td></tr>
+                <tr><td>State Management</td><td>Riverpod</td><td>2.6</td><td>Flutter state management</td></tr>
+                <tr><td>Speech-to-Text</td><td>Deepgram (Nova-2)</td><td>SDK 3.7</td><td>Real-time speech recognition</td></tr>
+                <tr><td>LLM Brain</td><td>Google Gemini Flash</td><td>SDK 0.8</td><td>Intent extraction + response generation</td></tr>
+                <tr><td>Embeddings</td><td>Gemini text-embedding-004</td><td>768-dim</td><td>Vector embeddings for RAG</td></tr>
+                <tr><td>Text-to-Speech</td><td>ElevenLabs</td><td>SDK 2.55</td><td>Ultra-realistic voice synthesis</td></tr>
+                <tr><td>CRM</td><td>Salesforce</td><td>API v60</td><td>Lead & knowledge sync</td></tr>
+                <tr><td>Cloud Storage</td><td>AWS S3 (boto3)</td><td>1.42</td><td>Call recording storage</td></tr>
+                <tr><td>Telephony</td><td>Tata Smartflo</td><td>—</td><td>SIP trunk for phone calls</td></tr>
+                <tr><td>WebRTC</td><td>LiveKit</td><td>—</td><td>Low-latency audio streaming</td></tr>
+                <tr><td>RAG Chunking</td><td>LangChain Text Splitters</td><td>0.0.1</td><td>Document chunking for RAG</td></tr>
+                <tr><td>Containerization</td><td>Docker + Docker Compose</td><td>3.8</td><td>Container orchestration</td></tr>
+                <tr><td>Reverse Proxy</td><td>Nginx + Certbot</td><td>—</td><td>SSL + static file serving</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ==================== FOOTER ==================== -->
+    <div class="doc-footer">
+        <p>📄 NexaVoice — Complete Project Documentation</p>
+        <p style="margin-top: 4px;">Generated August 2026 | Confidential</p>
+    </div>
+
+</div>
+
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'dark',
+        themeVariables: {
+            primaryColor: '#3b82f6',
+            primaryTextColor: '#f8fafc',
+            primaryBorderColor: '#3b82f6',
+            lineColor: '#64748b',
+            secondaryColor: '#1e293b',
+            tertiaryColor: '#1e1b4b',
+            fontSize: '14px',
+        },
+        flowchart: {
+            useMaxWidth: true,
+            htmlLabels: true,
+            curve: 'basis',
+        },
+        er: {
+            useMaxWidth: true,
+            fontSize: 12,
+        },
+        sequence: {
+            useMaxWidth: true,
+            fontSize: 13,
+        }
+    });
+</script>
+
+</body>
+</html>

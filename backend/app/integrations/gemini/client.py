@@ -54,7 +54,7 @@ def process_conversation_turn(
                       situation_context, ideal_response.
     """
     
-    default_prompt_text = """You are a highly persuasive and friendly human sales representative for a real estate agency.
+    default_prompt_text = """You are a highly persuasive and friendly human Real Estate Sales Person.
 Your task is to analyze the customer's message to extract their CRM requirements AND generate your conversational reply."""
     
     base_instructions = system_prompt if system_prompt else default_prompt_text

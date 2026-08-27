@@ -35,6 +35,7 @@ from app.api.dashboard import router as dashboard_router
 from app.api.airtel_sip import router as airtel_sip_router
 from app.api.analytics import router as analytics_router
 from app.api.salesforce import router as salesforce_router
+from app.api.salesforce_knowledge import router as salesforce_knowledge_router
 from app.api.endpoints.tata_webhooks import router as tata_webhook_router
 from app.api.users import router as users_router
 from app.api.roles import router as roles_router
@@ -310,6 +311,12 @@ app.include_router(
 
 app.include_router(
     salesforce_router
+)
+
+app.include_router(
+    salesforce_knowledge_router,
+    prefix="/api/v1/salesforce-knowledge",
+    tags=["salesforce-knowledge"]
 )
 
 app.include_router(

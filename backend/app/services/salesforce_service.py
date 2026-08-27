@@ -189,4 +189,65 @@ class SalesforceService:
             }
         ]
 
+    def fetch_knowledge_articles(self) -> list[dict]:
+        """
+        Query Knowledge Articles from Salesforce REST API.
+        """
+        if not self.access_token or not self.instance_url:
+            print("[SALESFORCE] Not authenticated. Fetching mock Salesforce knowledge articles instead.")
+            return self._get_mock_knowledge_articles()
+
+        try:
+            # Simple SOQL query to fetch KnowledgeArticleVersion
+            soql = "SELECT Id, Title, Summary, ArticleType FROM KnowledgeArticleVersion WHERE PublishStatus = 'Online' AND Language = 'en_US' LIMIT 50"
+            url = f"{self.instance_url}/services/data/v60.0/query"
+            headers = {
+                'Authorization': f"Bearer {self.access_token}",
+                'Content-Type': 'application/json'
+            }
+            res = requests.get(url, headers=headers, params={'q': soql}, timeout=10)
+            if res.status_code == 200:
+                records = res.json().get('records', [])
+                articles = []
+                for rec in records:
+                    articles.append({
+                        'salesforce_id': rec.get('Id'),
+                        'title': rec.get('Title'),
+                        'content': rec.get('Summary'),
+                        'type': rec.get('ArticleType', 'Knowledge')
+                    })
+                print(f"[SALESFORCE] Fetched {len(articles)} knowledge articles successfully.")
+                return articles
+            else:
+                print(f"[SALESFORCE] API error (HTTP {res.status_code}): {res.text}")
+                return self._get_mock_knowledge_articles()
+        except Exception as e:
+            print(f"[SALESFORCE] Exception while fetching knowledge articles: {e}")
+            return self._get_mock_knowledge_articles()
+
+    def _get_mock_knowledge_articles(self) -> list[dict]:
+        """
+        Realistic mock Salesforce knowledge articles for testable RAG integration.
+        """
+        return [
+            {
+                'salesforce_id': 'kA05h000000ABCD',
+                'title': 'Skyline Towers - Project Overview',
+                'content': 'Skyline Towers is a premium residential project located in Bandra West, Mumbai. It offers 2, 3, and 4 BHK luxury apartments. Amenities include a rooftop infinity pool, a fully equipped gymnasium, a spa, and 24/7 concierge service. The project is RERA registered (P51800001234) and possession is expected by December 2027. Pricing starts at ₹4.5 Crores for a 2 BHK.',
+                'type': 'Property_Overview__kav'
+            },
+            {
+                'salesforce_id': 'kA05h000000EFGH',
+                'title': 'Green Valley Estates - Floor Plans and Pricing',
+                'content': 'Green Valley Estates is located in Pune, offering spacious 3 BHK and 4 BHK villas surrounded by nature. The 3 BHK villas have a carpet area of 2,200 sq.ft and are priced at ₹3.2 Crores. The 4 BHK villas span 3,500 sq.ft and are priced at ₹4.8 Crores. The property features a golf course, club house, and dedicated jogging tracks.',
+                'type': 'Property_Overview__kav'
+            },
+            {
+                'salesforce_id': 'kA05h000000IJKL',
+                'title': 'NRI Investment Guidelines and Home Loan Eligibility',
+                'content': 'Non-Resident Indians (NRIs) can easily invest in real estate in India. They are eligible for home loans up to 80% of the property value from major banks like SBI, HDFC, and ICICI. Required documents include a valid passport, visa, overseas address proof, and the last 6 months of salary slips or NRE/NRO bank statements. Repayment must be done via NRE or NRO accounts.',
+                'type': 'FAQ__kav'
+            }
+        ]
+
 salesforce_service = SalesforceService()

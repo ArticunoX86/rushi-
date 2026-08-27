@@ -17,6 +17,7 @@ from app.models.tenant import Tenant
 from app.models.voice_agent import VoiceAgent
 from app.models.campaign import Campaign
 from app.models.ai_training_data import AITrainingData, TrainingCategory
+from app.models.knowledge import KnowledgeDocument, DocumentChunk
 
 __all__ = [
 

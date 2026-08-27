@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Brain, Plus, Trash2, Edit3, ChevronDown, ChevronUp, Zap, TrendingUp, BookOpen, Shield, HelpCircle, Lightbulb, BarChart3, Upload, Sparkles, CheckCircle2, XCircle, AlertTriangle, Search, RefreshCw } from 'lucide-react';
+import { Brain, Plus, Trash2, Edit3, ChevronDown, ChevronUp, Zap, TrendingUp, BookOpen, Shield, HelpCircle, Lightbulb, BarChart3, Upload, Sparkles, CheckCircle2, XCircle, AlertTriangle, Search, RefreshCw, Cloud, Database } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api';
 
@@ -398,6 +398,20 @@ const AITraining = () => {
     setTimeout(() => setNotification(null), 3500);
   };
 
+  const [showPending, setShowPending] = useState(false);
+  const [activeTab, setActiveTab] = useState('TRAINING'); // 'TRAINING' | 'SALESFORCE'
+  const [sfDocs, setSfDocs] = useState([]);
+  const [syncing, setSyncing] = useState(false);
+
+  const fetchSfDocs = useCallback(async () => {
+    try {
+      const res = await api.get('/salesforce-knowledge');
+      setSfDocs(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
@@ -409,12 +423,13 @@ const AITraining = () => {
       ]);
       setEntries(entriesRes.data);
       setStats(statsRes.data);
+      if (activeTab === 'SALESFORCE') fetchSfDocs();
     } catch (err) {
-      showNotif('Failed to load training data.', 'error');
+      showNotif('Failed to load data.', 'error');
     } finally {
       setLoading(false);
     }
-  }, [activeCategory]);
+  }, [activeCategory, activeTab, fetchSfDocs]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -445,6 +460,9 @@ const AITraining = () => {
   };
 
   const filteredEntries = entries.filter(e => {
+    if (showPending && e.is_active) return false;
+    if (!showPending && !e.is_active && e.tags?.includes("Auto-Generated")) return false; // Hide pending by default unless toggle is on
+
     if (!search.trim()) return true;
     const q = search.toLowerCase();
     return (
@@ -453,6 +471,19 @@ const AITraining = () => {
       e.ideal_response?.toLowerCase().includes(q)
     );
   });
+
+  const handleSyncSalesforce = async () => {
+    setSyncing(true);
+    try {
+      await api.post('/salesforce-knowledge/sync');
+      showNotif('Salesforce Sync started in background. Documents will appear shortly.');
+      setTimeout(fetchSfDocs, 3000);
+    } catch (err) {
+      showNotif('Sync failed.', 'error');
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -485,27 +516,58 @@ const AITraining = () => {
             <h1 className="text-2xl font-bold text-white">AI Training & Knowledge Base</h1>
           </div>
           <p className="text-muted text-sm ml-13 pl-13">
-            Curate scripts, objection handlers, and FAQs that are automatically injected into every live AI call.
+            Curate scripts, objection handlers, and sync Salesforce Knowledge.
           </p>
         </div>
+        
+        {/* Tab Switcher */}
+        <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
+          <button
+            onClick={() => setActiveTab('TRAINING')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'TRAINING' ? 'bg-accent-primary text-white shadow' : 'text-muted hover:text-white'}`}
+          >
+            Rules & Scripts
+          </button>
+          <button
+            onClick={() => setActiveTab('SALESFORCE')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'SALESFORCE' ? 'bg-[#00a1e0] text-white shadow' : 'text-muted hover:text-white'}`}
+          >
+            <Cloud size={14} />
+            Salesforce RAG
+          </button>
+        </div>
+
         <div className="flex items-center gap-3 flex-wrap">
-          <button
-            id="seed-defaults-btn"
-            onClick={handleSeed}
-            disabled={seeding}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border border-accent-primary/30 text-accent-primary hover:bg-accent-primary/10 transition-colors disabled:opacity-50"
-          >
-            {seeding ? <RefreshCw size={14} className="animate-spin" /> : <Sparkles size={14} />}
-            {seeding ? 'Seeding...' : 'Seed Defaults'}
-          </button>
-          <button
-            id="add-training-entry-btn"
-            onClick={() => { setEditEntry(null); setShowModal(true); }}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-accent-primary text-white hover:bg-accent-primary/80 transition-colors"
-          >
-            <Plus size={16} />
-            Add Entry
-          </button>
+          {activeTab === 'TRAINING' ? (
+            <>
+              <button
+                id="seed-defaults-btn"
+                onClick={handleSeed}
+                disabled={seeding}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border border-accent-primary/30 text-accent-primary hover:bg-accent-primary/10 transition-colors disabled:opacity-50"
+              >
+                {seeding ? <RefreshCw size={14} className="animate-spin" /> : <Sparkles size={14} />}
+                {seeding ? 'Seeding...' : 'Seed Defaults'}
+              </button>
+              <button
+                id="add-training-entry-btn"
+                onClick={() => { setEditEntry(null); setShowModal(true); }}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-accent-primary text-white hover:bg-accent-primary/80 transition-colors"
+              >
+                <Plus size={16} />
+                Add Entry
+              </button>
+            </>
+          ) : (
+             <button
+                onClick={handleSyncSalesforce}
+                disabled={syncing}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-[#00a1e0] text-white hover:bg-[#00a1e0]/80 transition-colors disabled:opacity-50"
+              >
+                {syncing ? <RefreshCw size={16} className="animate-spin" /> : <Database size={16} />}
+                {syncing ? 'Syncing...' : 'Sync from Salesforce'}
+              </button>
+          )}
         </div>
       </div>
 
@@ -600,73 +662,141 @@ const AITraining = () => {
         </div>
       )}
 
-      {/* Filter Bar */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-          <input
-            id="training-search"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search entries..."
-            className="w-full bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] rounded-xl pl-9 pr-4 py-2.5 text-white text-sm placeholder:text-muted/50 focus:outline-none focus:border-accent-primary/50 transition-colors"
-          />
-        </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          {CATEGORIES.map(cat => (
+      {/* Filter Bar (Only for Training Tab) */}
+      {activeTab === 'TRAINING' && (
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+            <input
+              id="training-search"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search entries..."
+              className="w-full bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] rounded-xl pl-9 pr-4 py-2.5 text-white text-sm placeholder:text-muted/50 focus:outline-none focus:border-accent-primary/50 transition-colors"
+            />
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
             <button
-              key={cat.value}
-              id={`filter-${cat.value.toLowerCase()}`}
-              onClick={() => setActiveCategory(cat.value)}
+              onClick={() => { setShowPending(!showPending); setActiveCategory('ALL'); }}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-colors ${
-                activeCategory === cat.value
-                  ? 'bg-accent-primary text-white'
-                  : 'text-muted hover:text-white bg-white/5 hover:bg-white/10'
+                showPending
+                  ? 'bg-orange-500/20 text-orange-400 border border-orange-500/50'
+                  : 'text-muted hover:text-white bg-white/5 hover:bg-white/10 border border-transparent'
               }`}
             >
-              {cat.icon}
-              {cat.label}
+              <AlertTriangle size={14} />
+              Pending Approvals
             </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Entry List */}
-      <div className="space-y-3">
-        {loading ? (
-          <div className="flex items-center justify-center py-16">
-            <div className="flex flex-col items-center gap-3">
-              <RefreshCw size={28} className="text-accent-primary animate-spin" />
-              <p className="text-muted text-sm">Loading knowledge base...</p>
-            </div>
-          </div>
-        ) : filteredEntries.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-purple-500/10 flex items-center justify-center mb-4">
-              <Brain size={32} className="text-purple-400/50" />
-            </div>
-            <p className="text-white font-medium mb-1">
-              {search ? 'No matching entries' : 'No training entries yet'}
-            </p>
-            <p className="text-muted text-sm max-w-sm">
-              {search
-                ? 'Try a different search term or clear the filter.'
-                : 'Click "Seed Defaults" to instantly load real estate scripts, or "Add Entry" to create your own.'}
-            </p>
-          </div>
-        ) : (
-          <AnimatePresence mode="popLayout">
-            {filteredEntries.map(entry => (
-              <EntryRow
-                key={entry.id}
-                entry={entry}
-                onEdit={(e) => { setEditEntry(e); setShowModal(true); }}
-                onDelete={handleDelete}
-              />
+            <div className="w-px h-6 bg-white/10 mx-1"></div>
+            {CATEGORIES.map(cat => (
+              <button
+                key={cat.value}
+                id={`filter-${cat.value.toLowerCase()}`}
+                onClick={() => { setActiveCategory(cat.value); setShowPending(false); }}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-colors ${
+                  activeCategory === cat.value && !showPending
+                    ? 'bg-accent-primary text-white'
+                    : 'text-muted hover:text-white bg-white/5 hover:bg-white/10'
+                }`}
+              >
+                {cat.icon}
+                {cat.label}
+              </button>
             ))}
-          </AnimatePresence>
-        )}
-      </div>
+          </div>
+        </div>
+      )}
+
+      {/* Main Content Area */}
+      {activeTab === 'TRAINING' ? (
+        <div className="space-y-3">
+          {loading ? (
+            <div className="flex items-center justify-center py-16">
+              <div className="flex flex-col items-center gap-3">
+                <RefreshCw size={28} className="text-accent-primary animate-spin" />
+                <p className="text-muted text-sm">Loading knowledge base...</p>
+              </div>
+            </div>
+          ) : filteredEntries.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="w-16 h-16 rounded-2xl bg-purple-500/10 flex items-center justify-center mb-4">
+                <Brain size={32} className="text-purple-400/50" />
+              </div>
+              <p className="text-white font-medium mb-1">
+                {showPending ? 'No pending approvals' : search ? 'No matching entries' : 'No training entries yet'}
+              </p>
+              <p className="text-muted text-sm max-w-sm">
+                {showPending ? 'All auto-generated learning opportunities have been reviewed.' : search
+                  ? 'Try a different search term or clear the filter.'
+                  : 'Click "Seed Defaults" to instantly load real estate scripts, or "Add Entry" to create your own.'}
+              </p>
+            </div>
+          ) : (
+            <AnimatePresence mode="popLayout">
+              {filteredEntries.map(entry => (
+                <EntryRow
+                  key={entry.id}
+                  entry={entry}
+                  onEdit={(e) => { setEditEntry(e); setShowModal(true); }}
+                  onDelete={handleDelete}
+                />
+              ))}
+            </AnimatePresence>
+          )}
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <div className="glass-panel p-6 rounded-2xl border border-[rgba(255,255,255,0.06)]">
+            <div className="flex gap-4">
+              <div className="w-12 h-12 rounded-xl bg-[#00a1e0]/20 flex items-center justify-center shrink-0">
+                <Database size={24} className="text-[#00a1e0]" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white mb-1">Salesforce Vector Knowledge Base</h3>
+                <p className="text-muted text-sm">
+                  Documents synced from Salesforce are chunked and converted into vector embeddings using Google Gemini. 
+                  During a live call, the AI performs a semantic search to instantly recall accurate facts from these documents.
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {sfDocs.map(doc => (
+              <div key={doc.id} className="glass-panel rounded-xl p-5 border border-[rgba(255,255,255,0.06)]">
+                <div className="flex justify-between items-start mb-3">
+                  <div className="bg-[#00a1e0]/20 text-[#00a1e0] px-2 py-1 rounded-md text-xs font-bold uppercase">
+                    {doc.type}
+                  </div>
+                  <button 
+                    onClick={async () => {
+                      if(window.confirm('Delete this synced document and all its vectors?')) {
+                        await api.delete(`/salesforce-knowledge/${doc.id}`);
+                        fetchSfDocs();
+                      }
+                    }}
+                    className="text-muted hover:text-red-400"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+                <h4 className="text-white font-medium text-base mb-2">{doc.title}</h4>
+                <div className="flex justify-between items-center text-xs text-muted mt-4">
+                  <span>{doc.chunks_count} Vector Chunks</span>
+                  <span>ID: {doc.id.substring(0, 8)}...</span>
+                </div>
+              </div>
+            ))}
+            {sfDocs.length === 0 && (
+              <div className="col-span-full flex flex-col items-center justify-center py-16 text-center">
+                <Cloud size={40} className="text-[#00a1e0]/40 mb-4" />
+                <p className="text-white font-medium mb-1">No Salesforce Knowledge Synced</p>
+                <p className="text-muted text-sm">Click "Sync from Salesforce" to pull Knowledge Articles and Property details.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Modal */}
       <AnimatePresence>

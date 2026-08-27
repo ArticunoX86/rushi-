@@ -1,7 +1,6 @@
 import os
 import sys
 
-# Add backend directory to sys.path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from app.database.session import SessionLocal
@@ -19,49 +18,40 @@ def seed_scenarios():
 
         entries = [
             {
-                "title": "Wrong Person Objection",
+                "title": "Speak to Human / Manager",
                 "category": TrainingCategory.OBJECTION_HANDLING,
-                "trigger_phrase": "wrong number, wrong person, not prathamesh",
-                "situation_context": "Customer says we called the wrong person",
-                "ideal_response": "I am so sorry about that! It seems we had the wrong number in our records. I won't bother you further. Have a great day ahead!",
-                "tags": ["wrong_number", "wrong_person"],
+                "trigger_phrase": "speak to a human, real person, talk to manager, are you a bot",
+                "situation_context": "Customer realizes it's an AI or wants to escalate to a human.",
+                "ideal_response": "I totally get that! Um, I'm the AI assistant for the property team. I can definitely have one of our senior managers call you back right away. When is a good time for them to reach you?",
+                "tags": ["escalation", "human", "bot"],
+                "priority": 10,
+            },
+            {
+                "title": "Call Back Later",
+                "category": TrainingCategory.OBJECTION_HANDLING,
+                "trigger_phrase": "call me later, busy right now, driving, in a meeting",
+                "situation_context": "Customer is busy and wants to be called later.",
+                "ideal_response": "Oh, my bad for catching you at a bad time! I'll quickly shoot you a text on WhatsApp so you have my number, and I'll follow up tomorrow. Sound good?",
+                "tags": ["busy", "call_back", "meeting"],
                 "priority": 9,
             },
             {
-                "title": "Bad Connection Objection",
-                "category": TrainingCategory.OBJECTION_HANDLING,
-                "trigger_phrase": "breaking, bad connection, can't hear, network",
-                "situation_context": "Customer can't hear due to bad network",
-                "ideal_response": "I am sorry for the bad connection! I'll quickly send the property details on WhatsApp so you don't miss out. Does that work?",
-                "tags": ["bad_connection", "voice_breaking", "whatsapp_follow_up"],
-                "priority": 9,
-            },
-            {
-                "title": "Suspicious / Scam Objection",
-                "category": TrainingCategory.OBJECTION_HANDLING,
-                "trigger_phrase": "scam, trust, real, how do i know",
-                "situation_context": "Customer is suspicious and thinks it's a scam",
-                "ideal_response": "I completely understand your concern! We are a RERA registered developer. I'd be happy to send our official brochure and RERA registration details right now on WhatsApp for you to verify.",
-                "tags": ["scam", "suspicious", "trust"],
-                "priority": 9,
-            },
-            {
-                "title": "Specific Requirement - Ground Floor",
+                "title": "Technical / Out of Scope Question",
                 "category": TrainingCategory.FAQ,
-                "trigger_phrase": "ground floor, bad knees, elderly",
-                "situation_context": "Customer needs ground floor for specific reasons",
-                "ideal_response": "We definitely have ground floor units available specifically designed for easy accessibility! They come with private garden spaces too. Should I send you the layout?",
-                "tags": ["ground_floor", "accessibility"],
+                "trigger_phrase": "legal fees, stamp duty exactly, construction material used, cement brand",
+                "situation_context": "Customer asks a highly technical or legal question the AI shouldn't answer.",
+                "ideal_response": "Hmm, you know, I don't have the exact technical details for that right in front of me. Let me have our legal and technical expert text you that specific info so I don't give you the wrong numbers. Anything else about the layout or location I can help with?",
+                "tags": ["technical", "deflection", "unknown"],
                 "priority": 8,
             },
             {
-                "title": "Investor Playbook",
+                "title": "Successful Call Wrap-up (Complete Call)",
                 "category": TrainingCategory.SALES_PLAYBOOK,
-                "trigger_phrase": "invest, investor, rental, roi",
-                "situation_context": "Customer is an investor looking for ROI",
-                "ideal_response": "For investors, this is a prime opportunity! The area has a 6-7% rental yield and property values are appreciating fast due to the upcoming metro. We have premium commercial and residential units. Would you prefer pre-leased commercial spaces or residential?",
-                "tags": ["investor", "roi", "rental_yield"],
-                "priority": 8,
+                "trigger_phrase": "sounds good, sure send it, okay bye, thanks, i will visit",
+                "situation_context": "The conversation is wrapping up successfully after they agreed to something.",
+                "ideal_response": "Perfect! I'm really glad we connected. I'll get that over to you right away on WhatsApp. Thanks so much for your time, have a great day!",
+                "tags": ["wrap_up", "goodbye", "success"],
+                "priority": 10,
             }
         ]
         
@@ -71,7 +61,7 @@ def seed_scenarios():
                 crud.create(db, AITrainingDataCreate(**entry_data))
                 seeded += 1
             
-        print(f"Successfully seeded {seeded} scenario training entries!")
+        print(f"Successfully seeded {seeded} NEW scenario training entries!")
     finally:
         db.close()
 

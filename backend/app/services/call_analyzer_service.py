@@ -5,6 +5,7 @@ from app.database.session import SessionLocal
 from app.models.call import Call
 from app.models.enums import CallOutcome, CallStatus
 from app.integrations.gemini.client import model
+from app.models.ai_training_data import AITrainingData, TrainingCategory
 
 async def analyze_call_async(call_id: str):
     """
@@ -53,6 +54,10 @@ The JSON must have the following keys:
    - "callback_requested" (Customer asked to be called back later)
    - "no_response" (Customer didn't answer or hung up immediately)
    - "converted" (Customer agreed to a meeting or site visit)
+3. "learning_opportunities": A list of objects if the AI failed to handle an objection or lacked knowledge. Otherwise empty list []. Each object should have:
+   - "trigger_phrase": The exact phrase or core objection the customer raised.
+   - "situation_context": A brief description of the context.
+   - "ideal_response": A better way the AI SHOULD have responded to this objection/question.
 """
         
         try:
@@ -69,6 +74,22 @@ The JSON must have the following keys:
                 call.outcome = CallOutcome.INTERESTED if outcome_str == "INTERESTED" else None
                 
             print(f"Analyzed call {call_id}: {call.outcome}")
+
+            # Auto-generate AI Training Data for learning opportunities
+            learning_ops = result.get("learning_opportunities", [])
+            for op in learning_ops:
+                new_training = AITrainingData(
+                    title=f"Auto-Learning: {op.get('trigger_phrase', 'Unknown')[:30]}",
+                    category=TrainingCategory.OBJECTION_HANDLING,
+                    trigger_phrase=op.get("trigger_phrase", ""),
+                    situation_context=op.get("situation_context", ""),
+                    ideal_response=op.get("ideal_response", ""),
+                    tags=["Auto-Generated"],
+                    priority=5,
+                    is_active=False # Requires human approval
+                )
+                db.add(new_training)
+                print(f"Drafted new AI Training entry: {new_training.title}")
             
         except Exception as e:
             print(f"Failed to analyze call {call_id} with Gemini: {e}")

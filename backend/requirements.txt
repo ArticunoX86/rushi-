@@ -24,3 +24,5 @@ livekit-plugins-elevenlabs
 livekit-plugins-google
 cartesia==1.0.0
 bcrypt==4.0.1
+pgvector==0.2.5
+langchain-text-splitters==0.0.1

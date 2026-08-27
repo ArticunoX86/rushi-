@@ -166,6 +166,39 @@ def process_customer_message(
     ]
     training_entry_ids = [e.id for e in relevant_entries]
     
+    # ==================================================
+    # Fetch Salesforce Knowledge Base Context (RAG)
+    # ==================================================
+    from app.api.salesforce_knowledge import generate_embedding
+    from app.models.knowledge import DocumentChunk
+    
+    rag_context_snippets = []
+    try:
+        # Generate embedding for the incoming customer message
+        query_embedding = generate_embedding(request.message)
+        
+        # Skip query if embedding failed (returned all zeros)
+        if not all(v == 0.0 for v in query_embedding):
+            # Use pgvector cosine distance to find top 3 relevant chunks
+            similar_chunks = db.query(DocumentChunk).order_by(
+                DocumentChunk.embedding.cosine_distance(query_embedding)
+            ).limit(3).all()
+            
+            for chunk in similar_chunks:
+                rag_context_snippets.append(chunk.chunk_text)
+    except Exception as e:
+        db.rollback()
+        print(f"Failed to fetch RAG context: {e}")
+
+    if rag_context_snippets:
+        training_context.append({
+            "category": "SALESFORCE_KNOWLEDGE_BASE",
+            "title": "Verified Ground Truth Facts from Salesforce",
+            "trigger_phrase": "",
+            "situation_context": "Use these exact facts to answer any questions about properties, amenities, pricing, or rules.",
+            "ideal_response": "\n\n".join(rag_context_snippets)
+        })
+    
     # SINGLE API CALL: Extracts CRM data AND generates response
     ai_result = process_conversation_turn(
         history=history_lines,
