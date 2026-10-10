@@ -4,7 +4,7 @@
 # Salesforce AI Calling Agent - Backend Startup Script
 # ==================================================
 
-set -e  # Exit immediately on any error
+set -e  # Exit immediately on any erro
 
 # -- Colors --
 RED='\033[0;31m'
@@ -65,9 +65,9 @@ log_success "Virtual environment activated."
 
 # -- Step 4: Install / sync dependencies --
 if [ -f "requirements.txt" ]; then
-    log_info "Installing dependencies from requirements.txt ..."
-    pip install -r requirements.txt --quiet
-    log_success "Dependencies installed."
+    log_info "Skipping dependency check for faster startup..."
+    # pip install -r requirements.txt --quiet
+    # log_success "Dependencies installed."
 else
     log_warn "requirements.txt not found -- skipping."
 fi
